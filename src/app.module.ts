@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import envConfig, { envValidation } from './configs/env.config';
+import { DatabaseModule } from './database/database.module';
 
 const VALID_ENV = ['local', 'development', 'production'];
 const environment = process.env.NODE_ENV ?? 'local';
@@ -17,6 +18,7 @@ const environment = process.env.NODE_ENV ?? 'local';
       load: [envConfig],
       validationSchema: envValidation,
     }),
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
