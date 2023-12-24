@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: bookingcare-be
+    image: bookingcare-be
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - env/.env.production
+    restart: unless-stopped
+    networks:
+      - bookingcare-be
+    depends_on:
+      - db
+
+  db:
+    container_name: bookingcare-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    env_file:
+      - env/.env.production
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - .docker/data/db:/data/db
+    restart: unless-stopped
+    networks:
+      - bookingcare-be
+
+  # pgadmin:
+  #   container_name: pgadmin4
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - ${PGADMIN_PORT}:80
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - db
+
+networks:
+  bookingcare-be:
+    driver: bridge

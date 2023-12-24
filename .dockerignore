@@ -1,0 +1,10 @@
+Dockerfile
+.docker
+node_modules
+dist
+.git
+.github
+test
+*.log
+.husky
+*.md
