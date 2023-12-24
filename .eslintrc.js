@@ -20,6 +20,6 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'warn', // rule for function returnType
     '@typescript-eslint/no-unused-vars': 'warn', // unused
     'no-console': 'warn',
-    'prettier/prettier': 'warn',
+    'prettier/prettier': ['warn', { endOfLine: 'auto' }],
   },
 };
