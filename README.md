@@ -58,6 +58,20 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Deployment
+
+### Production
+
+```bash
+docker compose --env-file env/.env.production up -d --build
+```
+
+### Development
+
+```bash
+docker compose -f docker-compose.dev.yml --env-file env/.env.development up -d --build
+```
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
