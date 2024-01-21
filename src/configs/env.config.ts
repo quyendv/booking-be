@@ -7,6 +7,7 @@ export interface IEnvironmentConfig {
   nodeEnv: 'local' | 'development' | 'production';
   // logger: 'enabled' | 'disabled';
   database: TypeOrmModuleOptions;
+  mailer: { resendAPIKey: string };
 }
 
 export const envValidation = Joi.object({
@@ -17,6 +18,7 @@ export const envValidation = Joi.object({
   DB_USERNAME: Joi.required(),
   DB_PASSWORD: Joi.required(),
   DB_NAME: Joi.required(),
+  RESEND_API_KEY: Joi.required(),
 });
 
 export default registerAs<IEnvironmentConfig>('environment', () => ({
@@ -37,4 +39,5 @@ export default registerAs<IEnvironmentConfig>('environment', () => ({
     migrations: ['dist/database/migrations/*.js'],
     migrationsTableName: 'migrations',
   },
+  mailer: { resendAPIKey: process.env.RESEND_API_KEY as string },
 }));
