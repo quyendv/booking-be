@@ -15,40 +15,40 @@ import { ABaseEntity } from './a.base.entity';
 import { IBaseService } from './i.base.service';
 
 export abstract class BaseService<T extends ABaseEntity> implements IBaseService<T> {
-  constructor(private readonly repository: Repository<T>) {}
+  constructor(private readonly _repository: Repository<T>) {}
 
   createInstance(data: DeepPartial<T>): T {
-    return this.repository.create(data);
+    return this._repository.create(data);
   }
 
   createOne(data: DeepPartial<T>): Promise<T> {
-    return this.repository.save(data);
+    return this._repository.save(data);
   }
 
   createMany(dataArray: DeepPartial<T>[]): Promise<T[]> {
-    return this.repository.save(dataArray);
+    return this._repository.save(dataArray);
   }
 
   findById(id: EntityId, options?: FindOneOptions<T>): Promise<T | null> {
-    // return this.repository.findOneBy({ id } as FindOptionsWhere<T>);
-    return this.repository.findOne({ ...options, where: { id } as FindOptionsWhere<T> });
+    // return this._repository.findOneBy({ id } as FindOptionsWhere<T>);
+    return this._repository.findOne({ ...options, where: { id } as FindOptionsWhere<T> });
   }
 
   findByIds(ids: EntityId[], options?: FindOneOptions<T>): Promise<T[]> {
-    // return this.repository.findBy({ id: In(ids) } as FindOptionsWhere<T>);
-    return this.repository.find({ ...options, where: { id: In(ids) } as FindOptionsWhere<T> });
+    // return this._repository.findBy({ id: In(ids) } as FindOptionsWhere<T>);
+    return this._repository.find({ ...options, where: { id: In(ids) } as FindOptionsWhere<T> });
   }
 
   findOne(options: FindOneOptions<T>): Promise<T | null> {
-    return this.repository.findOne(options);
+    return this._repository.findOne(options);
   }
 
   findAll(options?: FindManyOptions<T>): Promise<T[]> {
-    return this.repository.find(options);
+    return this._repository.find(options);
   }
 
   updateOne(id: EntityId, data: DeepPartial<T>): Promise<T> {
-    return this.repository.save({ ...data, id });
+    return this._repository.save({ ...data, id });
   }
 
   update(
@@ -64,19 +64,19 @@ export abstract class BaseService<T extends ABaseEntity> implements IBaseService
       | FindOptionsWhere<T>,
     partialEntity: QueryDeepPartialEntity<T>,
   ): Promise<UpdateResult> {
-    return this.repository.update(criteria, partialEntity);
+    return this._repository.update(criteria, partialEntity);
   }
 
   softDelete(id: EntityId): Promise<UpdateResult> {
-    return this.repository.softDelete(id);
+    return this._repository.softDelete(id);
   }
 
   restore(id: EntityId): Promise<UpdateResult> {
-    return this.repository.restore(id);
+    return this._repository.restore(id);
   }
 
   permanentDelete(id: EntityId): Promise<DeleteResult> {
-    return this.repository.delete(id);
+    return this._repository.delete(id);
   }
 
   // *** Advanced: // FIXME: see findOrCreate of sequelize
@@ -101,7 +101,7 @@ export abstract class BaseService<T extends ABaseEntity> implements IBaseService
   //   entityOrEntities: QueryDeepPartialEntity<T> | QueryDeepPartialEntity<T>[],
   //   conflictPaths: string[],
   // ): Promise<InsertResult> {
-  //   return this.repository.upsert(entityOrEntities, {
+  //   return this._repository.upsert(entityOrEntities, {
   //     conflictPaths,
   //     skipUpdateIfNoValuesChanged: true,
   //   });

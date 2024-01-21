@@ -2,10 +2,16 @@ import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 
+const VALID_ENV = ['local', 'development', 'production'];
+const environment = process.env.NODE_ENV ?? VALID_ENV[0];
+
+export const envPath = `${process.cwd()}/env/.env.${
+  VALID_ENV.includes(environment) ? environment : VALID_ENV[0]
+}`;
+
 export interface IEnvironmentConfig {
   port: number;
   nodeEnv: 'local' | 'development' | 'production';
-  // logger: 'enabled' | 'disabled';
   database: TypeOrmModuleOptions;
   mailer: { resendAPIKey: string };
 }
@@ -36,7 +42,7 @@ export default registerAs<IEnvironmentConfig>('environment', () => ({
     // autoLoadEntities: true,
     synchronize: false,
     logging: false,
-    migrations: ['dist/database/migrations/*.js'],
+    migrations: ['dist/src/database/migrations/*.js', 'dist/src/database/seeds/*.js'],
     migrationsTableName: 'migrations',
   },
   mailer: { resendAPIKey: process.env.RESEND_API_KEY as string },

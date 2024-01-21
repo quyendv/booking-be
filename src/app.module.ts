@@ -6,19 +6,15 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CustomExceptionFilter } from './base/filters/exception.filter';
 import { LoggingInterceptor } from './base/interceptors/logging.interceptor';
-import envConfig, { envValidation } from './configs/env.config';
+import envConfig, { envPath, envValidation } from './configs/env.config';
 import { DatabaseModule } from './database/database.module';
 import { MailerModule } from './mailer/mailer.module';
-
-const VALID_ENV = ['local', 'development', 'production'];
-const environment = process.env.NODE_ENV ?? VALID_ENV[0];
+import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `${process.cwd()}/env/.env.${
-        VALID_ENV.includes(environment) ? environment : VALID_ENV[0]
-      }`,
+      envFilePath: envPath,
       isGlobal: true,
       load: [envConfig],
       validationSchema: envValidation,
@@ -26,6 +22,7 @@ const environment = process.env.NODE_ENV ?? VALID_ENV[0];
     DatabaseModule,
     AuthModule,
     MailerModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [

@@ -30,7 +30,18 @@ export abstract class TimestampEntity {
   deletedAt: Date;
 }
 
+// Use as a BaseEntityType for all entities that use EntityId as primary key (not extended by other entities)
 export abstract class ABaseEntity extends TimestampEntity {
-  @PrimaryGeneratedColumn('uuid')
+  // @PrimaryGeneratedColumn('uuid)
   id: EntityId;
+}
+
+export abstract class UuidBaseEntity extends TimestampEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string; // EntityId
+}
+
+export abstract class SequenceBaseEntity extends TimestampEntity {
+  @PrimaryGeneratedColumn('increment')
+  id: number; // Entity
 }
