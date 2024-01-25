@@ -1,11 +1,20 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import * as admin from 'firebase-admin';
+import { BaseResponse } from '~/base/types/response.type';
+import { IEnvironmentConfig } from '~/configs/env.config';
+import { UserEntity } from '~/users/entities/user.entity';
+import { UserService } from '~/users/user.service';
 import { UserPayload } from './types/request.type';
 
 @Injectable()
 export class AuthService {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor(/* private readonly userService: UserService */) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async authenticate(authToken: string | undefined): Promise<UserPayload> {
     if (!authToken) throw new BadRequestException('Missing Auth Token');
@@ -19,22 +28,62 @@ export class AuthService {
       const tokenString = match[1];
       const decodedToken: admin.auth.DecodedIdToken = await admin.auth().verifyIdToken(tokenString);
 
-      const { email, uid, picture, name }: UserPayload = decodedToken;
-      return { email, uid, picture, name };
+      if (!decodedToken.email) {
+        throw new UnauthorizedException('Token does not contain the user email'); // if provider is not google, email/password, ...
+      }
+      const userPayload: UserPayload = {
+        email: decodedToken.email,
+        uid: decodedToken.uid,
+        picture: decodedToken.picture,
+        name: decodedToken.name,
+      };
+      return userPayload;
     } catch (error) {
       throw new UnauthorizedException(error);
     }
   }
 
-  // async signIn(payload: Payload): Promise<UserEntity> {
-  //   const user = await this.userService.getUserByEmail(payload.email as string, {
-  //     roles: true,
-  //   });
-  //   if (!user) {
-  //     throw new UnauthorizedException(
-  //       `User ${payload.email} not found or INACTIVE in the system. Require admin active this email`,
-  //     );
-  //   }
-  //   return user;
-  // }
+  async signIn(payload: UserPayload): Promise<UserEntity> {
+    const user = await this.userService.getUserByEmail(payload.email, true);
+    if (!user) {
+      throw new UnauthorizedException(`Verified user "${payload.email}" not found`);
+    }
+    return user;
+  }
+
+  async signUp(payload: UserPayload): Promise<BaseResponse> {
+    const existingUser = await this.userService.getUserByEmail(payload.email);
+    if (existingUser) {
+      throw new UnauthorizedException(`User "${payload.email}" already exists`);
+    }
+    const verifyLink = await this.generateVerifiedLink(payload);
+    await this.userService.sendVerificationEmail(payload.email, verifyLink);
+    await this.userService.signUpCustomer(payload.email);
+    return { message: 'Verification email sent' };
+  }
+
+  private async generateVerifiedLink(payload: UserPayload): Promise<string> {
+    const { clientURL, jwtSecret } = <IEnvironmentConfig>this.configService.get('environment');
+    const token = await this.jwtService.signAsync(payload, { secret: jwtSecret, expiresIn: '2d' });
+    return `${clientURL}/verify-email?token=${token}`;
+  }
+
+  async verifyEmail(payload: UserPayload, token: string): Promise<UserEntity> {
+    const { jwtSecret } = <IEnvironmentConfig>this.configService.get('environment');
+    try {
+      const decodeToken = await this.jwtService.verifyAsync<UserPayload>(token, {
+        secret: jwtSecret,
+      });
+      if (decodeToken.email !== payload.email) {
+        // NOTE: should save the token (hashed) to db and check equality
+        throw new UnauthorizedException('Invalid token');
+      }
+      return this.userService.verifyCustomer(payload.email);
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedException('Token expired. Please sign up again!');
+      }
+      throw error;
+    }
+  }
 }

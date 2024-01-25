@@ -1,8 +1,8 @@
+import { Exclude, Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { TimestampEntity } from '~/base/a.base.entity';
-import { RoleEntity } from './role.entity';
-import { Exclude, Expose } from 'class-transformer';
 import { RoleTypes } from '../constants/user.constant';
+import { RoleEntity } from './role.entity';
 
 @Entity('users')
 export class UserEntity extends TimestampEntity {

@@ -2,16 +2,23 @@ import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 
-const VALID_ENV = ['local', 'development', 'production'];
-const environment = process.env.NODE_ENV ?? VALID_ENV[0];
+export enum VALID_ENV {
+  LOCAL = 'local',
+  DEVELOPMENT = 'development',
+  PRODUCTION = 'production',
+}
+
+const environment = (process.env.NODE_ENV as any) ?? VALID_ENV.LOCAL;
 
 export const envPath = `${process.cwd()}/env/.env.${
-  VALID_ENV.includes(environment) ? environment : VALID_ENV[0]
+  Object.values(VALID_ENV).includes(environment) ? environment : VALID_ENV.LOCAL
 }`;
 
 export interface IEnvironmentConfig {
   port: number;
-  nodeEnv: 'local' | 'development' | 'production';
+  nodeEnv: VALID_ENV;
+  clientURL: string;
+  jwtSecret: string;
   database: TypeOrmModuleOptions;
   mailer: { resendAPIKey: string };
 }
@@ -19,6 +26,8 @@ export interface IEnvironmentConfig {
 export const envValidation = Joi.object({
   // NODE_ENV: Joi.string().valid('development', 'production'),
   PORT: Joi.number().default(8080),
+  CLIENT_URL: Joi.string().required(),
+  JWT_SECRET: Joi.string().required(),
   DB_HOST: Joi.required(),
   DB_PORT: Joi.required(),
   DB_USERNAME: Joi.required(),
@@ -29,8 +38,9 @@ export const envValidation = Joi.object({
 
 export default registerAs<IEnvironmentConfig>('environment', () => ({
   port: Number(process.env.PORT),
-  nodeEnv: process.env.NODE_ENV as any,
-  // logger: process.env.LOGGER,
+  nodeEnv: environment,
+  clientURL: <string>process.env.CLIENT_URL,
+  jwtSecret: <string>process.env.JWT_SECRET,
   database: {
     type: 'postgres',
     host: process.env.DB_HOST,
