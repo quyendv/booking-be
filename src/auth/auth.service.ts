@@ -65,20 +65,20 @@ export class AuthService {
   private async generateVerifiedLink(payload: UserPayload): Promise<string> {
     const { clientURL, jwtSecret } = <IEnvironmentConfig>this.configService.get('environment');
     const token = await this.jwtService.signAsync(payload, { secret: jwtSecret, expiresIn: '2d' });
-    return `${clientURL}/verify-email?token=${token}`;
+    return `${clientURL}/en/verify-email?token=${token}`; // TODO: should be dynamic
   }
 
-  async verifyEmail(payload: UserPayload, token: string): Promise<UserEntity> {
+  async verifyEmail(token: string): Promise<UserEntity> {
     const { jwtSecret } = <IEnvironmentConfig>this.configService.get('environment');
     try {
       const decodeToken = await this.jwtService.verifyAsync<UserPayload>(token, {
         secret: jwtSecret,
       });
-      if (decodeToken.email !== payload.email) {
-        // NOTE: should save the token (hashed) to db and check equality
-        throw new UnauthorizedException('Invalid token');
-      }
-      return this.userService.verifyCustomer(payload.email);
+      // if (decodeToken.email !== payload.email) {
+      //   // NOTE: should save the token (hashed) to db and check equality
+      //   throw new UnauthorizedException('Invalid token');
+      // }
+      return this.userService.verifyCustomer(decodeToken.email);
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException('Token expired. Please sign up again!');

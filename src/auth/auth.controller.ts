@@ -9,6 +9,7 @@ import {
 import { BaseResponse } from '~/base/types/response.type';
 import { UserEntity } from '~/users/entities/user.entity';
 import { AuthService } from './auth.service';
+import { Public } from './decorators/public.decorator';
 import { AuthUser } from './decorators/user.decorator';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { AuthGuard } from './guards/auth.guard';
@@ -31,7 +32,8 @@ export class AuthController {
   }
 
   @Post('verify-email')
-  verifyEmail(@AuthUser() user: UserPayload, @Body() body: VerifyEmailDto): Promise<UserEntity> {
-    return this.authService.verifyEmail(user, body.verifyToken);
+  @Public()
+  verifyEmail(@Body() body: VerifyEmailDto): Promise<UserEntity> {
+    return this.authService.verifyEmail(body.verifyToken);
   }
 }
