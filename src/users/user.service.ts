@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
@@ -39,11 +44,14 @@ export class UserService extends BaseService<UserEntity> {
   }
 
   async verifyCustomer(email: string): Promise<UserEntity> {
-    const user = await this.getUserByEmail(email, false);
+    const user = await this.getUserByEmail(email);
     if (!user) {
       throw new InternalServerErrorException(
         `Unverified user "${email}" was not created before verifying`,
       );
+    }
+    if (user.isVerified) {
+      throw new BadRequestException(`User "${email}" has already been verified`);
     }
     return this.updateOne(user.id, { isVerified: true });
   }
