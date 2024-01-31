@@ -20,7 +20,12 @@ export interface IEnvironmentConfig {
   clientURL: string;
   jwtSecret: string;
   database: TypeOrmModuleOptions;
-  mailer: { resendAPIKey: string };
+  mailer: {
+    resendAPIKey: string;
+    googleOauthClientID: string;
+    googleOauthClientSecret: string;
+    googleMailerRefreshToken: string;
+  };
 }
 
 export const envValidation = Joi.object({
@@ -34,6 +39,9 @@ export const envValidation = Joi.object({
   DB_PASSWORD: Joi.required(),
   DB_NAME: Joi.required(),
   RESEND_API_KEY: Joi.required(),
+  GOOGLE_OAUTH_CLIENT_ID: Joi.required(),
+  GOOGLE_OAUTH_CLIENT_SECRET: Joi.required(),
+  GOOGLE_MAILER_REFRESH_TOKEN: Joi.required(),
 });
 
 export default registerAs<IEnvironmentConfig>('environment', () => ({
@@ -55,5 +63,10 @@ export default registerAs<IEnvironmentConfig>('environment', () => ({
     migrations: ['dist/src/database/migrations/*.js', 'dist/src/database/seeds/*.js'],
     migrationsTableName: 'migrations',
   },
-  mailer: { resendAPIKey: process.env.RESEND_API_KEY as string },
+  mailer: {
+    resendAPIKey: <string>process.env.RESEND_API_KEY,
+    googleOauthClientID: <string>process.env.GOOGLE_OAUTH_CLIENT_ID,
+    googleOauthClientSecret: <string>process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+    googleMailerRefreshToken: <string>process.env.GOOGLE_MAILER_REFRESH_TOKEN,
+  },
 }));
