@@ -6,7 +6,7 @@ export interface RequestWithUser extends Request {
 
 export interface UserPayload {
   uid: string;
-  email?: string;
+  email: string;
   picture?: string;
   name?: string;
 }

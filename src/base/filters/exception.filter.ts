@@ -1,4 +1,5 @@
 // import { ForbiddenError } from '@casl/ability';
+import { ForbiddenError } from '@casl/ability';
 import {
   ArgumentsHost,
   Catch,
@@ -8,7 +9,6 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost } from '@nestjs/core';
 import { Request, Response } from 'express';
 import { QueryFailedError } from 'typeorm';
@@ -17,12 +17,7 @@ import { QueryFailedError } from 'typeorm';
 export class CustomExceptionFilter implements ExceptionFilter {
   private showLogDetails: boolean;
 
-  constructor(
-    // private readonly logger: LoggerService,
-    private readonly httpAdapterHost: HttpAdapterHost,
-    private readonly configService: ConfigService,
-  ) {
-    // this.showLogDetails = this.configService.get<IAppConfig>('app')?.nodeEnv === 'development';
+  constructor(private readonly httpAdapterHost: HttpAdapterHost) {
     this.showLogDetails = true;
   }
 
@@ -55,12 +50,12 @@ export class CustomExceptionFilter implements ExceptionFilter {
         message: exception.message,
         error: this.showLogDetails ? exception.stack : exception.message,
       };
-      // } else if (exception instanceof ForbiddenError) {
-      //   statusCode = HttpStatus.FORBIDDEN;
-      //   responseBody = {
-      //     statusCode,
-      //     message: exception.message,
-      //   };
+    } else if (exception instanceof ForbiddenError) {
+      statusCode = HttpStatus.FORBIDDEN;
+      responseBody = {
+        statusCode,
+        message: exception.message,
+      };
     } else if (exception instanceof Error) {
       responseBody = {
         statusCode: statusCode,
@@ -81,6 +76,6 @@ export class CustomExceptionFilter implements ExceptionFilter {
   }
 }
 
-type CommonException = HttpException | QueryFailedError /* | ForbiddenError<any> */ | Error;
+type CommonException = HttpException | QueryFailedError | ForbiddenError<any> | Error;
 
 const INTERNAL_SERVER_ERROR_MSG = 'Internal Server Error';
