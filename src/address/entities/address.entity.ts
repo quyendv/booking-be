@@ -7,6 +7,9 @@ export class AddressEntity extends SequenceBaseEntity {
   details: string; // street, house number, etc.
 
   @Column('varchar', { nullable: true })
+  ward: string;
+
+  @Column('varchar', { nullable: true })
   district: string;
 
   @Column('varchar')

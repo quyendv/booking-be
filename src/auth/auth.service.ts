@@ -32,8 +32,8 @@ export class AuthService {
         throw new UnauthorizedException('Token does not contain the user email'); // if provider is not google, email/password, ...
       }
       const userPayload: UserPayload = {
+        // uid: decodedToken.uid,
         email: decodedToken.email,
-        uid: decodedToken.uid,
         picture: decodedToken.picture,
         name: decodedToken.name,
       };
@@ -56,9 +56,11 @@ export class AuthService {
     if (existingUser) {
       throw new UnauthorizedException(`User "${payload.email}" already exists`);
     }
-    const verifyLink = await this.generateVerifiedLink(payload);
-    await this.userService.signUpCustomer(payload);
-    await this.userService.sendVerificationEmail(payload.email, verifyLink);
+    await this.userService.createUnverifiedCustomer(payload);
+    await this.userService.sendVerificationEmail(
+      payload.email,
+      await this.generateVerifiedLink(payload),
+    );
     return { message: 'Verification email sent' };
   }
 

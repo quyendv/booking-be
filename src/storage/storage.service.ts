@@ -2,15 +2,21 @@ import { Bucket } from '@google-cloud/storage';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import { getDownloadURL } from 'firebase-admin/storage';
+import { StorageFolders } from './constants/storage.constant';
 import { StorageUploadResult } from './types/storage.type';
-
-const ROOT_FOLDER = 'default';
 
 @Injectable()
 export class StorageService {
+  private generateFilePath(originalname: string, folder: string, prefix: string): string {
+    return `${folder.endsWith('/') ? folder : `${folder}/`}${
+      prefix ? `${prefix}-` : prefix
+    }${Date.now()}-${originalname.replace(/\s/g, '_')}`; // TODO: Validate file name to match(/^[A-Za-z0-9_-]+$/), not contain special characters like ~,!,@,#,$,%,^,&,*,(,),+,=,whitespace
+  }
+
   async upload(
-    file: Express.Multer.File,
-    folder = ROOT_FOLDER,
+    file: Express.Multer.File | undefined,
+    folder = StorageFolders.DEFAULT,
+    prefix = '',
     _bucket?: Bucket,
   ): Promise<StorageUploadResult | null> {
     if (!file) throw new BadRequestException('File is required');
@@ -20,10 +26,7 @@ export class StorageService {
 
     const bucket = _bucket ?? admin.storage().bucket();
 
-    const filePath = `${
-      folder.endsWith('/') ? folder : `${folder}/`
-    }${Date.now()}-${file.originalname.replace(/\s/g, '_')}`; // TODO: Validate file name to match(/^[A-Za-z0-9_-]+$/), not contain special characters like ~,!,@,#,$,%,^,&,*,(,),+,=,whitespace
-
+    const filePath = this.generateFilePath(file.originalname, folder, prefix);
     const blob = bucket.file(filePath);
     const blobStream = blob.createWriteStream({ contentType: file.mimetype });
 
@@ -41,10 +44,13 @@ export class StorageService {
 
   async uploadMultiple(
     files: Express.Multer.File[],
-    folder = ROOT_FOLDER,
+    folder = StorageFolders.DEFAULT,
+    prefix = '',
   ): Promise<(StorageUploadResult | null)[]> {
     const bucket = admin.storage().bucket();
-    const result = await Promise.all(files.map((file) => this.upload(file, folder, bucket)));
+    const result = await Promise.all(
+      files.map((file) => this.upload(file, folder, prefix, bucket)),
+    );
     return result;
   }
 

@@ -1,10 +1,14 @@
-import { PartialType, PickType } from '@nestjs/swagger';
+import { PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class AddressDto {
   @IsNotEmpty()
   @IsString()
   details: string;
+
+  @IsNotEmpty()
+  @IsString()
+  ward: string;
 
   @IsNotEmpty()
   @IsString()
@@ -19,4 +23,4 @@ export class AddressDto {
   country: string;
 }
 
-export class UpdateAddressDto extends PartialType(AddressDto) {}
+export class OptionalAddressDto extends PartialType(AddressDto) {}
