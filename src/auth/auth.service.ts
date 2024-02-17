@@ -44,9 +44,9 @@ export class AuthService {
   }
 
   async signIn(payload: UserPayload): Promise<UserEntity> {
-    const user = await this.userService.getUserByEmail(payload.email, true);
+    const user = await this.userService.getUserByEmail(payload.email);
     if (!user) {
-      throw new UnauthorizedException(`Verified user "${payload.email}" not found`);
+      throw new UnauthorizedException(`User "${payload.email}" not found`);
     }
     return user;
   }
@@ -57,8 +57,8 @@ export class AuthService {
       throw new UnauthorizedException(`User "${payload.email}" already exists`);
     }
     const verifyLink = await this.generateVerifiedLink(payload);
+    await this.userService.signUpCustomer(payload);
     await this.userService.sendVerificationEmail(payload.email, verifyLink);
-    await this.userService.signUpCustomer(payload.email);
     return { message: 'Verification email sent' };
   }
 

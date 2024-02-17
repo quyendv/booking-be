@@ -6,7 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
+import { UserPayload } from '~/auth/types/request.type';
 import { BaseService } from '~/base/a.base.service';
+import { CustomerService } from '~/customers/customer.service';
 import { MailerService } from '~/mailer/mailer.service';
 import { RoleTypes } from './constants/user.constant';
 import { UserEntity } from './entities/user.entity';
@@ -18,6 +20,7 @@ export class UserService extends BaseService<UserEntity> {
     @InjectRepository(UserEntity) repository: Repository<UserEntity>,
     private readonly mailerService: MailerService,
     private readonly roleService: RoleService,
+    private readonly customerService: CustomerService,
   ) {
     super(repository);
   }
@@ -38,9 +41,14 @@ export class UserService extends BaseService<UserEntity> {
     Logger.log(`Verification email sent to "${email}"`, 'Done');
   }
 
-  async signUpCustomer(email: string): Promise<UserEntity> {
+  async signUpCustomer(payload: UserPayload): Promise<UserEntity> {
     const role = await this.roleService.getRoleByName(RoleTypes.CUSTOMER);
-    return this.createOne({ id: email, isVerified: false, role });
+    await this.customerService.createOne({
+      id: payload.email,
+      name: payload.name,
+      avatar: payload.picture,
+    });
+    return this.createOne({ id: payload.email, isVerified: false, role });
   }
 
   async verifyCustomer(email: string): Promise<UserEntity> {
