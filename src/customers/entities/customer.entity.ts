@@ -27,12 +27,12 @@ export class CustomerEntity extends TimestampEntity {
   @Column('varchar', { nullable: true })
   gender: GenderTypes;
 
-  @OneToOne(() => AddressEntity, { nullable: true })
+  @OneToOne(() => AddressEntity, { nullable: true, cascade: true })
   @JoinColumn({ name: 'address_id' })
   address: AddressEntity;
 
   // Foreign Keys
   @Exclude({ toPlainOnly: true })
-  @Column('varchar', { nullable: true })
-  address_id: string;
+  @Column('int', { nullable: true })
+  address_id: number;
 }

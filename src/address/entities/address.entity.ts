@@ -4,7 +4,7 @@ import { SequenceBaseEntity } from '~/base/a.base.entity';
 @Entity('addresses')
 export class AddressEntity extends SequenceBaseEntity {
   @Column('varchar')
-  address: string; // street, house number, etc.
+  details: string; // street, house number, etc.
 
   @Column('varchar', { nullable: true })
   district: string;
