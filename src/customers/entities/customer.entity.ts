@@ -13,10 +13,10 @@ export class CustomerEntity extends TimestampEntity {
   name: string;
 
   @Column('varchar', { nullable: true })
-  avatar: string;
+  avatar: string | null;
 
   @Column('varchar', { nullable: true })
-  avatarKey: string;
+  avatarKey: string | null;
 
   @Column('date', { nullable: true })
   birthday: string;

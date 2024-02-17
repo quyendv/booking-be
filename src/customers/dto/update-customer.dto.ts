@@ -13,11 +13,13 @@ import { Validator } from '~/base/constants/validator.constant';
 import { GenderTypes } from '../constants/customer.constant';
 import { Type } from 'class-transformer';
 
-export class UpdateCustomerDto {
+export class EmailDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+}
 
+export class UpdateCustomerInfoDto extends EmailDto {
   @IsOptional()
   @IsString()
   name?: string;
@@ -38,4 +40,10 @@ export class UpdateCustomerDto {
   @ValidateNested()
   @Type(() => UpdateAddressDto)
   address?: UpdateAddressDto;
+}
+
+export class UpdateCustomerAvatarDto extends EmailDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 }

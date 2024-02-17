@@ -17,4 +17,8 @@ export class CommonUtils {
       return groups;
     }, {} as Record<K, T>);
   }
+
+  static getEmailName(email: string): string {
+    return email.split('@')[0];
+  }
 }
