@@ -4,6 +4,7 @@ import * as admin from 'firebase-admin';
 import { getDownloadURL } from 'firebase-admin/storage';
 import { StorageFolders } from './constants/storage.constant';
 import { StorageUploadResult } from './types/storage.type';
+import axios from 'axios';
 
 @Injectable()
 export class StorageService {
@@ -13,7 +14,7 @@ export class StorageService {
     }${Date.now()}-${originalname.replace(/\s/g, '_')}`; // TODO: Validate file name to match(/^[A-Za-z0-9_-]+$/), not contain special characters like ~,!,@,#,$,%,^,&,*,(,),+,=,whitespace
   }
 
-  async upload(
+  async uploadFile(
     file: Express.Multer.File | undefined,
     folder = StorageFolders.DEFAULT,
     prefix = '',
@@ -42,6 +43,28 @@ export class StorageService {
     });
   }
 
+  private async getFileFromImageUrl(url: string): Promise<any> {
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    const buffer = Buffer.from(response.data, 'binary');
+    const file: any = {
+      buffer,
+      originalname: `${url.split('/').pop()?.split('?')[0]}-${Date.now()}` || `${Date.now()}`,
+      mimetype: response.headers['content-type'],
+      size: buffer.length,
+    };
+    return file;
+  }
+
+  async uploadFromUrl(
+    url: string,
+    folder = StorageFolders.DEFAULT,
+    prefix = '',
+    _bucket?: Bucket,
+  ): Promise<StorageUploadResult | null> {
+    const file = await this.getFileFromImageUrl(url);
+    return this.uploadFile(file, folder, prefix, _bucket);
+  }
+
   async uploadMultiple(
     files: Express.Multer.File[],
     folder = StorageFolders.DEFAULT,
@@ -49,7 +72,7 @@ export class StorageService {
   ): Promise<(StorageUploadResult | null)[]> {
     const bucket = admin.storage().bucket();
     const result = await Promise.all(
-      files.map((file) => this.upload(file, folder, prefix, bucket)),
+      files.map((file) => this.uploadFile(file, folder, prefix, bucket)),
     );
     return result;
   }
