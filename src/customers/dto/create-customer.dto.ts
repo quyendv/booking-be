@@ -62,7 +62,7 @@ export class CreateCustomerFormDataDto extends OmitType(CreateCustomerDto, ['add
   @Type(() => OptionalAddressDto)
   @Transform(({ obj }) => {
     const dto = obj as CreateCustomerFormDataDto;
-    if (dto.country || dto.province || dto.district || dto.ward || dto.address_details) {
+    if (dto.country || dto.province /* || dto.district || dto.ward */ || dto.address_details) {
       return {
         country: dto.country,
         province: dto.province,
@@ -73,7 +73,7 @@ export class CreateCustomerFormDataDto extends OmitType(CreateCustomerDto, ['add
     }
     return undefined;
   })
-  address?: OptionalAddressDto = {}; // NOTE: need default value to transform
+  address?: OptionalAddressDto = {} as any; // NOTE: need default value to transform
 } // multipart/form-data
 
 export class CreateTestCustomerDto extends CreateCustomerFormDataDto {

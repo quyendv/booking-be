@@ -1,5 +1,4 @@
-import { PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class AddressDto {
   @IsNotEmpty()
@@ -23,4 +22,25 @@ export class AddressDto {
   country: string;
 }
 
-export class OptionalAddressDto extends PartialType(AddressDto) {}
+// export class OptionalAddressDto extends PartialType(AddressDto) {}
+export class OptionalAddressDto {
+  @IsNotEmpty()
+  @IsString()
+  details: string;
+
+  @IsOptional()
+  @IsString()
+  ward: string;
+
+  @IsOptional()
+  @IsString()
+  district: string;
+
+  @IsNotEmpty()
+  @IsString()
+  province: string;
+
+  @IsNotEmpty()
+  @IsString()
+  country: string;
+}
