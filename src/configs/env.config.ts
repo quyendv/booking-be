@@ -19,6 +19,7 @@ export interface IEnvironmentConfig {
   nodeEnv: VALID_ENV;
   clientURL: string;
   jwtSecret: string;
+  firebase: { defaultAccountPassword: string };
   database: TypeOrmModuleOptions;
   mailer: {
     resendAPIKey: string;
@@ -33,6 +34,7 @@ export const envValidation = Joi.object({
   PORT: Joi.number().default(8080),
   CLIENT_URL: Joi.string().required(),
   JWT_SECRET: Joi.string().required(),
+  FIREBASE_DEFAULT_ACCOUNT_PASSWORD: Joi.string().required(),
   DB_HOST: Joi.required(),
   DB_PORT: Joi.required(),
   DB_USERNAME: Joi.required(),
@@ -49,6 +51,9 @@ export default registerAs<IEnvironmentConfig>('environment', () => ({
   nodeEnv: environment,
   clientURL: <string>process.env.CLIENT_URL,
   jwtSecret: <string>process.env.JWT_SECRET,
+  firebase: {
+    defaultAccountPassword: <string>process.env.FIREBASE_DEFAULT_ACCOUNT_PASSWORD,
+  },
   database: {
     type: 'postgres',
     host: process.env.DB_HOST,

@@ -10,6 +10,9 @@ import envConfig, { envPath, envValidation } from './configs/env.config';
 import { DatabaseModule } from './database/database.module';
 import { MailerModule } from './mailer/mailer.module';
 import { UserModule } from './users/user.module';
+import { CustomerModule } from './customers/customer.module';
+import { AddressModule } from './address/address.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -21,8 +24,11 @@ import { UserModule } from './users/user.module';
     }),
     DatabaseModule,
     AuthModule,
+    StorageModule,
     MailerModule,
     UserModule,
+    CustomerModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [

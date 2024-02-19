@@ -32,8 +32,8 @@ export class AuthService {
         throw new UnauthorizedException('Token does not contain the user email'); // if provider is not google, email/password, ...
       }
       const userPayload: UserPayload = {
+        // uid: decodedToken.uid,
         email: decodedToken.email,
-        uid: decodedToken.uid,
         picture: decodedToken.picture,
         name: decodedToken.name,
       };
@@ -44,9 +44,9 @@ export class AuthService {
   }
 
   async signIn(payload: UserPayload): Promise<UserEntity> {
-    const user = await this.userService.getUserByEmail(payload.email, true);
+    const user = await this.userService.getUserByEmail(payload.email);
     if (!user) {
-      throw new UnauthorizedException(`Verified user "${payload.email}" not found`);
+      throw new UnauthorizedException(`User "${payload.email}" not found`);
     }
     return user;
   }
@@ -56,9 +56,11 @@ export class AuthService {
     if (existingUser) {
       throw new UnauthorizedException(`User "${payload.email}" already exists`);
     }
-    const verifyLink = await this.generateVerifiedLink(payload);
-    await this.userService.sendVerificationEmail(payload.email, verifyLink);
-    await this.userService.signUpCustomer(payload.email);
+    await this.userService.createUnverifiedCustomer(payload);
+    await this.userService.sendVerificationEmail(
+      payload.email,
+      await this.generateVerifiedLink(payload),
+    );
     return { message: 'Verification email sent' };
   }
 

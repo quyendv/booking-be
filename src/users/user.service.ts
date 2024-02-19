@@ -1,16 +1,21 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
+import { CustomerService } from '~/customers/customer.service';
+import { CreateCustomerDto } from '~/customers/dto/create-customer.dto';
 import { MailerService } from '~/mailer/mailer.service';
 import { RoleTypes } from './constants/user.constant';
 import { UserEntity } from './entities/user.entity';
 import { RoleService } from './sub-services/role.service';
+import { StorageFileInfo } from '~/storage/types/storage.type';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -18,6 +23,7 @@ export class UserService extends BaseService<UserEntity> {
     @InjectRepository(UserEntity) repository: Repository<UserEntity>,
     private readonly mailerService: MailerService,
     private readonly roleService: RoleService,
+    @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
   ) {
     super(repository);
   }
@@ -38,9 +44,22 @@ export class UserService extends BaseService<UserEntity> {
     Logger.log(`Verification email sent to "${email}"`, 'Done');
   }
 
-  async signUpCustomer(email: string): Promise<UserEntity> {
-    const role = await this.roleService.getRoleByName(RoleTypes.CUSTOMER);
-    return this.createOne({ id: email, isVerified: false, role });
+  async createUser(email: string, roleName: RoleTypes, isVerified = false): Promise<UserEntity> {
+    const existingUser = await this.getUserByEmail(email);
+    if (existingUser) {
+      throw new BadRequestException(`User "${email}" already exists`);
+    }
+    const role = await this.roleService.getRoleByName(roleName);
+    return this.createOne({ id: email, isVerified, role });
+  }
+
+  async createUnverifiedCustomer(
+    dto: CreateCustomerDto,
+    avatarInfo?: StorageFileInfo,
+  ): Promise<UserEntity> {
+    const user = await this.createUser(dto.email, RoleTypes.CUSTOMER, false);
+    await this.customerService.createCustomer(dto, avatarInfo);
+    return user;
   }
 
   async verifyCustomer(email: string): Promise<UserEntity> {

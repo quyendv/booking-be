@@ -8,5 +8,6 @@ export function initFirebaseAdmin(): void {
       clientEmail: firebaseConfig.client_email,
       projectId: firebaseConfig.project_id,
     } as Partial<admin.ServiceAccount>),
+    storageBucket: `${firebaseConfig.project_id}.appspot.com`, // can different by location
   });
 }

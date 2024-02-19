@@ -4,12 +4,13 @@ import { AbilityFactory } from '../abilities/ability.factory';
 import { ROLES_KEY } from '../decorators/role.decorator';
 import { RequestWithUser } from '../types/request.type';
 import { UserPermission } from '../types/role.type';
+import { UserService } from '~/users/user.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    // private readonly userService: UserService,
+    private readonly userService: UserService,
     private readonly abilityFactory: AbilityFactory,
   ) {}
 
@@ -21,16 +22,12 @@ export class RolesGuard implements CanActivate {
 
     if (!requiredRoles || requiredRoles.length === 0) return true;
 
-    return true;
-    // const request = context.switchToHttp().getRequest<RequestWithUser>();
-    // const currentUser = await this.userService.getUserByEmail(request.user.email as string, {
-    //   roles: true,
-    // });
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
+    const currentUser = await this.userService.getUserByEmail(request.user.email);
 
-    // // if (!currentUser) throw new NotFoundException('User not found');
-    // if (!currentUser) return false;
+    if (!currentUser) return false;
 
-    // const ability = this.abilityFactory.defineAbility(currentUser);
-    // return requiredRoles.every((requiredRole) => ability.can(...requiredRole));
+    const ability = this.abilityFactory.defineAbility(currentUser);
+    return requiredRoles.every((requiredRole) => ability.can(...requiredRole));
   }
 }

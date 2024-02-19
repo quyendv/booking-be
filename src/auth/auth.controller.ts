@@ -14,10 +14,11 @@ import { AuthUser } from './decorators/user.decorator';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { UserPayload } from './types/request.type';
+import { RolesGuard } from './guards/role.guard';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
