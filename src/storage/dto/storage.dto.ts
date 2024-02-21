@@ -1,6 +1,12 @@
-import { IsNotEmpty, IsUrl } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 
-export class UploadByUrlDto {
+export class StorageUploadDto {
+  @IsOptional()
+  @IsString()
+  folder?: string;
+}
+
+export class UploadByUrlDto extends StorageUploadDto {
   @IsNotEmpty()
   @IsUrl()
   url: string;

@@ -32,7 +32,7 @@ import {
 import { CustomerEntity } from './entities/customer.entity';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('customers')
+@ApiTags('Customers')
 @Controller('customers')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard, RolesGuard)

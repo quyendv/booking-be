@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class AddressDto {
+export class FullyAddressDto {
   @IsNotEmpty()
   @IsString()
   details: string;
@@ -22,8 +22,8 @@ export class AddressDto {
   country: string;
 }
 
-// export class OptionalAddressDto extends PartialType(AddressDto) {}
-export class OptionalAddressDto {
+// export class AddressDto extends PartialType(FullyAddressDto) {}
+export class AddressDto {
   @IsNotEmpty()
   @IsString()
   details: string;

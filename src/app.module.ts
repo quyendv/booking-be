@@ -13,6 +13,7 @@ import { UserModule } from './users/user.module';
 import { CustomerModule } from './customers/customer.module';
 import { AddressModule } from './address/address.module';
 import { StorageModule } from './storage/storage.module';
+import { HotelModule } from './hotels/hotel.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { StorageModule } from './storage/storage.module';
     UserModule,
     CustomerModule,
     AddressModule,
+    HotelModule,
   ],
   controllers: [AppController],
   providers: [

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
-import { UploadByUrlDto } from './dto/storage.dto';
+import { StorageUploadDto, UploadByUrlDto } from './dto/storage.dto';
 import { StorageService } from './storage.service';
 import { StorageUploadResult } from './types/storage.type';
 
@@ -22,21 +22,25 @@ export class StorageController {
 
   @Post('upload/single')
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File): Promise<StorageUploadResult | null> {
-    return this.storageService.uploadFile(file);
+  uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: StorageUploadDto,
+  ): Promise<StorageUploadResult | null> {
+    return this.storageService.uploadFile(file, body.folder);
   }
 
   @Post('upload/multiple')
   @UseInterceptors(FilesInterceptor('files'))
   uploadMultipleFiles(
     @UploadedFiles() files: Express.Multer.File[],
+    @Body() body: StorageUploadDto,
   ): Promise<(StorageUploadResult | null)[]> {
-    return this.storageService.uploadMultiple(files);
+    return this.storageService.uploadMultiple(files, body.folder);
   }
 
   @Post('upload/url')
   async uploadFromURL(@Body() body: UploadByUrlDto): Promise<StorageUploadResult | null> {
-    return this.storageService.uploadFromUrl(body.url);
+    return this.storageService.uploadFromUrl(body.url, body.folder);
   }
 
   @Get(':filename')
