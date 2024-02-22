@@ -30,7 +30,9 @@ import {
   UpdateCustomerInfoDto,
 } from './dto/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Customers')
 @Controller('customers')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard, RolesGuard)

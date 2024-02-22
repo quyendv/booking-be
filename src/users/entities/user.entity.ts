@@ -1,11 +1,11 @@
 import { Exclude, Expose } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { TimestampEntity } from '~/base/a.base.entity';
+import { ABaseEntity } from '~/base/a.base.entity';
 import { RoleTypes } from '../constants/user.constant';
 import { RoleEntity } from './role.entity';
 
 @Entity('users')
-export class UserEntity extends TimestampEntity {
+export class UserEntity extends ABaseEntity {
   @PrimaryColumn('varchar')
   id: string; // email
 

@@ -15,7 +15,9 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { UserPayload } from './types/request.type';
 import { RolesGuard } from './guards/role.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard, RolesGuard)

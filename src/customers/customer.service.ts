@@ -31,7 +31,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
   ): Promise<CustomerEntity> {
     let uploadResult: StorageUploadResult | null = null;
     if (avatarInfo && avatarInfo.file) {
-      uploadResult = await this.storageService.upload(
+      uploadResult = await this.storageService.uploadFile(
         avatarInfo.file,
         avatarInfo.folder,
         avatarInfo.prefix,
@@ -69,7 +69,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
     const customer = await this.findOne({ where: { id: email } });
     if (!customer) throw new NotFoundException('Customer not found to update.');
 
-    const uploadResult = await this.storageService.upload(
+    const uploadResult = await this.storageService.uploadFile(
       file,
       `${StorageFolders.CUSTOMERS}`,
       CommonUtils.getEmailName(email),
@@ -93,7 +93,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
 
     let uploadResult: StorageUploadResult | null = null;
     if (file) {
-      uploadResult = await this.storageService.upload(
+      uploadResult = await this.storageService.uploadFile(
         file,
         StorageFolders.CUSTOMERS,
         CommonUtils.getEmailName(email),

@@ -8,7 +8,7 @@ import {
   Matches,
   ValidateNested,
 } from 'class-validator';
-import { OptionalAddressDto } from '~/address/dto/address.dto';
+import { AddressDto } from '~/address/dto/address.dto';
 import { Validator } from '~/base/constants/validator.constant';
 import { EmailDto } from '~/base/dto/base.dto';
 import { GenderTypes } from '../constants/customer.constant';
@@ -32,8 +32,8 @@ export class CreateCustomerDto extends EmailDto {
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => OptionalAddressDto)
-  address?: OptionalAddressDto;
+  @Type(() => AddressDto)
+  address?: AddressDto;
 } // json
 
 export class CreateCustomerFormDataDto extends OmitType(CreateCustomerDto, ['address'] as const) {
@@ -59,7 +59,7 @@ export class CreateCustomerFormDataDto extends OmitType(CreateCustomerDto, ['add
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => OptionalAddressDto)
+  @Type(() => AddressDto)
   @Transform(({ obj }) => {
     const dto = obj as CreateCustomerFormDataDto;
     if (dto.country || dto.province /* || dto.district || dto.ward */ || dto.address_details) {
@@ -73,7 +73,7 @@ export class CreateCustomerFormDataDto extends OmitType(CreateCustomerDto, ['add
     }
     return undefined;
   })
-  address?: OptionalAddressDto = {} as any; // NOTE: need default value to transform
+  address?: AddressDto = {} as any; // NOTE: need default value to transform
 } // multipart/form-data
 
 export class CreateTestCustomerDto extends CreateCustomerFormDataDto {
