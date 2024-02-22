@@ -8,6 +8,7 @@ import { HotelEntity } from './entities/hotel.entity';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { RoomEntity } from './entities/room.entity';
 
 @ApiTags('Hotels')
 @Controller('hotels')
@@ -18,7 +19,6 @@ export class HotelController {
   @Post()
   @Roles([PermissionActions.CREATE, HotelEntity])
   createHotel(@Body() body: CreateHotelDto): Promise<HotelEntity> {
-    return body as any;
     return this.hotelService.createOne(body);
   }
 
@@ -38,5 +38,33 @@ export class HotelController {
   @Roles([PermissionActions.LIST, HotelEntity])
   listHotels(): Promise<HotelEntity[]> {
     return this.hotelService.findAll();
+  }
+
+  @Post(':id/rooms')
+  @Roles([PermissionActions.CREATE, RoomEntity])
+  createRoom(@Body() body: any, @Param('id') id: string): Promise<RoomEntity> {
+    return this.hotelService.createRoom(+id, body);
+  }
+
+  @Patch(':id/rooms/:roomId')
+  @Roles([PermissionActions.UPDATE, RoomEntity])
+  updateRoom(
+    @Body() body: any,
+    // @Param('id') id: string,
+    @Param('roomId') roomId: string,
+  ): Promise<RoomEntity> {
+    return this.hotelService.updateRoom(+roomId, body);
+  }
+
+  @Get(':id/rooms')
+  @Roles([PermissionActions.LIST, RoomEntity])
+  listRooms(@Param('id') id: string): Promise<RoomEntity[]> {
+    return this.hotelService.listHotelRooms(+id);
+  }
+
+  @Get(':id/rooms/:roomId')
+  @Roles([PermissionActions.READ, RoomEntity])
+  getRoom(@Param('roomId') roomId: string): Promise<RoomEntity> {
+    return this.hotelService.getHotelRoomById(+roomId);
   }
 }

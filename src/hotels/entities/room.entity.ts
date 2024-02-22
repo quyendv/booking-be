@@ -2,6 +2,8 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { SequenceBaseEntity } from '~/base/a.base.entity';
 import { ColumnNumericTransformer } from '~/base/transformers/numeric.transformer';
 import { HotelEntity } from './hotel.entity';
+import { GalleryItem } from '../types/gallery.type';
+import { Exclude } from 'class-transformer';
 
 @Entity('hotel_rooms')
 export class RoomEntity extends SequenceBaseEntity {
@@ -17,7 +19,10 @@ export class RoomEntity extends SequenceBaseEntity {
   @Column('varchar', { name: 'image_key', nullable: true })
   imageKey: string;
 
-  @ManyToOne(() => HotelEntity, (hotel) => hotel.rooms)
+  @Column('jsonb', { name: 'gallery', default: [] })
+  gallery: GalleryItem[];
+
+  @ManyToOne(() => HotelEntity, (hotel) => hotel.rooms, { nullable: false })
   @JoinColumn({ name: 'hotel_id' })
   hotel: HotelEntity;
 
@@ -81,4 +86,9 @@ export class RoomEntity extends SequenceBaseEntity {
 
   @Column('bool', { name: 'sound_proofed', default: false })
   soundProofed: boolean;
+
+  // Foreign Keys
+  @Exclude({ toPlainOnly: true })
+  @Column('int', { name: 'hotel_id', nullable: false })
+  hotelId: number;
 }

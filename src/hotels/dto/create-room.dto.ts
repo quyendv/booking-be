@@ -1,18 +1,20 @@
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
   ValidateNested,
 } from 'class-validator';
-import { AddressDto } from '~/address/dto/address.dto';
+import { GalleryItemDto } from './create-hotel.dto';
 
-export class CreateHotelDto {
+export class CreateRoomDto {
   @IsNotEmpty()
   @IsString()
-  name: string;
+  title: string;
 
   @IsNotEmpty()
   @IsString()
@@ -31,62 +33,71 @@ export class CreateHotelDto {
   @Type(() => GalleryItemDto)
   gallery?: GalleryItemDto[];
 
-  @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => AddressDto)
-  address: AddressDto;
+  @IsOptional()
+  @IsInt()
+  bedCount: number;
+
+  @IsOptional()
+  @IsInt()
+  guestCount: number;
+
+  @IsOptional()
+  @IsInt()
+  bathroomCount: number;
+
+  @IsOptional()
+  @IsInt()
+  kingBed: number;
+
+  @IsOptional()
+  @IsInt()
+  queenBed: number;
+
+  @IsOptional()
+  @IsNumber()
+  breakFastPrice: number;
+
+  @IsOptional()
+  @IsNumber()
+  roomPrice: number;
 
   @IsOptional()
   @IsBoolean()
-  gym: boolean;
+  roomService: boolean;
 
   @IsOptional()
   @IsBoolean()
-  bar: boolean;
+  tv: boolean;
 
   @IsOptional()
   @IsBoolean()
-  restaurant: boolean;
+  balcony: boolean;
 
   @IsOptional()
   @IsBoolean()
-  freeParking: boolean;
+  freeWifi: boolean;
 
   @IsOptional()
   @IsBoolean()
-  movieNight: boolean;
+  cityView: boolean;
 
   @IsOptional()
   @IsBoolean()
-  coffeeShop: boolean;
+  oceanView: boolean;
 
   @IsOptional()
   @IsBoolean()
-  spa: boolean;
+  forestView: boolean;
 
   @IsOptional()
   @IsBoolean()
-  laundry: boolean;
+  mountainView: boolean;
 
   @IsOptional()
   @IsBoolean()
-  shopping: boolean;
+  airCondition: boolean;
 
   @IsOptional()
   @IsBoolean()
-  bikeRental: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  swimmingPool: boolean;
-}
-
-export class GalleryItemDto {
-  @IsNotEmpty()
-  @IsUrl()
-  url: string;
-
-  @IsOptional()
-  @IsString()
-  key?: string;
+  soundProofed: boolean;
 }
