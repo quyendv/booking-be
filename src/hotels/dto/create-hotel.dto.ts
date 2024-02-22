@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  ValidateNested,
+} from 'class-validator';
 import { AddressDto } from '~/address/dto/address.dto';
 
 export class CreateHotelDto {
@@ -19,52 +26,67 @@ export class CreateHotelDto {
   @IsString()
   imageKey: string;
 
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => GalleryItemDto)
+  gallery?: GalleryItemDto[];
+
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => AddressDto)
   address: AddressDto;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   gym: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   bar: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   restaurant: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   freeParking: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   movieNight: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   coffeeShop: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   spa: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   laundry: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   shopping: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   bikeRental: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   swimmingPool: boolean;
+}
+
+export class GalleryItemDto {
+  @IsNotEmpty()
+  @IsUrl()
+  url: string;
+
+  @IsOptional()
+  @IsString()
+  key?: string;
 }

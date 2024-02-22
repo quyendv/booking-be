@@ -18,21 +18,24 @@ export class HotelController {
   @Post()
   @Roles([PermissionActions.CREATE, HotelEntity])
   createHotel(@Body() body: CreateHotelDto): Promise<HotelEntity> {
+    return body as any;
     return this.hotelService.createOne(body);
   }
 
   @Patch(':id')
   @Roles([PermissionActions.UPDATE, HotelEntity])
-  updateHotel(@Body() body: UpdateHotelDto, @Param('id') id: number): Promise<HotelEntity> {
-    return this.hotelService.updateHotel(id, body);
+  updateHotel(@Body() body: UpdateHotelDto, @Param('id') id: string): Promise<HotelEntity> {
+    return this.hotelService.updateHotel(+id, body);
   }
 
   @Get(':id')
-  getHotel(@Param('id') id: number): Promise<HotelEntity> {
-    return this.hotelService.getHotelById(id);
+  @Roles([PermissionActions.GET, HotelEntity])
+  getHotel(@Param('id') id: string): Promise<HotelEntity> {
+    return this.hotelService.getHotelById(+id);
   }
 
   @Get()
+  @Roles([PermissionActions.LIST, HotelEntity])
   listHotels(): Promise<HotelEntity[]> {
     return this.hotelService.findAll();
   }

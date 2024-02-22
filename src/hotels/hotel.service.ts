@@ -33,6 +33,7 @@ export class HotelService extends BaseService<HotelEntity> {
       ...(data.address && {
         address: { ...data.address, id: hotel.address.id },
       }),
+      ...(data.gallery && { gallery: data.gallery }),
     });
   }
 }
