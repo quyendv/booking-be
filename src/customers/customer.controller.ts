@@ -4,6 +4,7 @@ import {
   ClassSerializerInterceptor,
   Controller,
   FileTypeValidator,
+  Get,
   ParseFilePipe,
   Patch,
   Post,
@@ -103,9 +104,9 @@ export class CustomerController {
     return this.customerService.updateCustomer(dto, file);
   }
 
+  @Post('test-account')
   @Roles([PermissionActions.CREATE, CustomerEntity])
   @UseInterceptors(FileInterceptor('file'))
-  @Post('test-account')
   createTestAccount(
     @UploadedFile(
       new ParseFilePipe({
@@ -117,5 +118,17 @@ export class CustomerController {
     @Body() body: CreateTestCustomerDto,
   ): Promise<UserEntity> {
     return this.customerService.createTestAccount(body, file);
+  }
+
+  @Get('me')
+  async getCurrentInfo(@AuthUser() user: UserPayload): Promise<CustomerEntity> {
+    const ability = await this.ability.getAbilityByEmail(user.email);
+    ForbiddenError.from(ability)
+      .setMessage('Admin or Owner Customer can read info.')
+      .throwUnlessCan(
+        PermissionActions.UPDATE,
+        this.customerService.createInstance({ id: user.email }),
+      );
+    return this.customerService.getCustomerByEmail(user.email);
   }
 }

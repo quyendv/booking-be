@@ -6,6 +6,9 @@ import { RoomEntity } from './room.entity';
 
 @Entity('hotels')
 export class HotelEntity extends SequenceBaseEntity {
+  @Column('varchar', { name: 'email', unique: true })
+  email: string;
+
   @Column('varchar', { name: 'name', length: 255 })
   name: string;
 

@@ -9,19 +9,35 @@ import { RoomService } from './sub-services/room.service';
 import { RoomEntity } from './entities/room.entity';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
+import { UserService } from '~/users/user.service';
+import { CreateHotelDto } from './dto/create-hotel.dto';
+import { RoleTypes } from '~/users/constants/user.constant';
 
 @Injectable()
 export class HotelService extends BaseService<HotelEntity> {
   constructor(
-    @InjectRepository(HotelEntity) private readonly repository: Repository<HotelEntity>,
+    @InjectRepository(HotelEntity) repository: Repository<HotelEntity>,
     private readonly roomService: RoomService,
+    private readonly userService: UserService,
     private readonly storageService: StorageService,
   ) {
     super(repository);
   }
 
+  async createHotel(data: CreateHotelDto): Promise<HotelEntity> {
+    await this.userService.createFirebaseUser(data.email);
+    await this.userService.createUser(data.email, RoleTypes.HOTEL, true);
+    return this.createOne(data);
+  }
+
   async getHotelById(id: number): Promise<HotelEntity> {
     const hotel = await this.findById(id);
+    if (!hotel) throw new NotFoundException('Hotel not found');
+    return hotel;
+  }
+
+  async getHotelByEmail(email: string): Promise<HotelEntity> {
+    const hotel = await this.findOne({ where: { email } });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }

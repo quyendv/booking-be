@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,6 +17,12 @@ import { RoleTypes } from './constants/user.constant';
 import { UserEntity } from './entities/user.entity';
 import { RoleService } from './sub-services/role.service';
 import { StorageFileInfo } from '~/storage/types/storage.type';
+import * as admin from 'firebase-admin';
+import { ConfigService } from '@nestjs/config';
+import { CurrentAccountInfo } from './types/user.type';
+import { UserPayload } from '~/auth/types/request.type';
+import { CommonUtils } from '~/base/utils/common.utils';
+import { HotelService } from '~/hotels/hotel.service';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -23,7 +30,9 @@ export class UserService extends BaseService<UserEntity> {
     @InjectRepository(UserEntity) repository: Repository<UserEntity>,
     private readonly mailerService: MailerService,
     private readonly roleService: RoleService,
+    private readonly configService: ConfigService,
     @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
+    @Inject(forwardRef(() => CustomerService)) private readonly hotelService: HotelService,
   ) {
     super(repository);
   }
@@ -73,5 +82,59 @@ export class UserService extends BaseService<UserEntity> {
       throw new BadRequestException(`User "${email}" has already been verified`);
     }
     return this.updateOne(user.id, { isVerified: true });
+  }
+
+  async createFirebaseUser(email: string, password?: string): Promise<void> {
+    try {
+      await admin.auth().createUser({
+        email,
+        password:
+          password ??
+          this.configService.getOrThrow<string>('environment.firebase.defaultAccountPassword'),
+      });
+    } catch (error) {
+      if (error.errorInfo?.code === 'auth/email-already-exists') {
+        // throw new BadRequestException('Email already exists.');
+        Logger.warn('Email already exists in Firebase.', 'UserService.createFirebaseUser');
+      } else throw error;
+    }
+  }
+
+  async getCurrentInfo(payload: UserPayload): Promise<CurrentAccountInfo> {
+    const user = await this.getUserByEmail(payload.email);
+    if (!user) throw new NotFoundException(`User ${payload.email} not found`);
+    if (user.roleName === RoleTypes.ADMIN) {
+      return {
+        id: user.id,
+        email: user.id,
+        isVerify: user.isVerified,
+        role: user.roleName,
+        avatar: payload.picture,
+        name: payload.name ?? CommonUtils.getEmailName(payload.email),
+      };
+    }
+    if (user.roleName === RoleTypes.CUSTOMER) {
+      const customer = await this.customerService.getCustomerByEmail(payload.email);
+      return {
+        id: customer.id,
+        email: user.id,
+        name: customer.name,
+        role: user.roleName,
+        isVerify: user.isVerified,
+        avatar: customer.avatar ?? undefined,
+      };
+    }
+    if (user.roleName === RoleTypes.HOTEL) {
+      const hotel = await this.hotelService.getHotelByEmail(payload.email);
+      return {
+        id: hotel.id,
+        email: user.id,
+        name: hotel.name,
+        role: user.roleName,
+        isVerify: user.isVerified,
+        avatar: hotel.imageUrl ?? undefined,
+      };
+    }
+    throw new InternalServerErrorException(`Role "${user.roleName}" is not supported`);
   }
 }

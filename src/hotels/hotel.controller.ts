@@ -19,7 +19,7 @@ export class HotelController {
   @Post()
   @Roles([PermissionActions.CREATE, HotelEntity])
   createHotel(@Body() body: CreateHotelDto): Promise<HotelEntity> {
-    return this.hotelService.createOne(body);
+    return this.hotelService.createHotel(body);
   }
 
   @Patch(':id')
