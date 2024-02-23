@@ -16,6 +16,8 @@ import { RoleTypes } from './constants/user.constant';
 import { UserEntity } from './entities/user.entity';
 import { RoleService } from './sub-services/role.service';
 import { StorageFileInfo } from '~/storage/types/storage.type';
+import * as admin from 'firebase-admin';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -23,6 +25,7 @@ export class UserService extends BaseService<UserEntity> {
     @InjectRepository(UserEntity) repository: Repository<UserEntity>,
     private readonly mailerService: MailerService,
     private readonly roleService: RoleService,
+    private readonly configService: ConfigService,
     @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
   ) {
     super(repository);
@@ -73,5 +76,21 @@ export class UserService extends BaseService<UserEntity> {
       throw new BadRequestException(`User "${email}" has already been verified`);
     }
     return this.updateOne(user.id, { isVerified: true });
+  }
+
+  async createFirebaseUser(email: string, password?: string): Promise<void> {
+    try {
+      await admin.auth().createUser({
+        email,
+        password:
+          password ??
+          this.configService.getOrThrow<string>('environment.firebase.defaultAccountPassword'),
+      });
+    } catch (error) {
+      if (error.errorInfo?.code === 'auth/email-already-exists') {
+        // throw new BadRequestException('Email already exists.');
+        Logger.warn('Email already exists in Firebase.', 'UserService.createFirebaseUser');
+      } else throw error;
+    }
   }
 }

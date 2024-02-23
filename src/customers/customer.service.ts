@@ -118,19 +118,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
     file: Express.Multer.File | undefined,
   ): Promise<UserEntity> {
     // Create if not exists (Firebase) (with default password - not throw error if exists)
-    try {
-      await admin.auth().createUser({
-        email: dto.email,
-        password: this.configService.getOrThrow<string>(
-          'environment.firebase.defaultAccountPassword',
-        ),
-      });
-    } catch (error) {
-      if (error.errorInfo?.code === 'auth/email-already-exists') {
-        // throw new BadRequestException('Email already exists.');
-        Logger.warn('Email already exists in Firebase.', 'CustomerService.createTestAccount');
-      } else throw error;
-    }
+    await this.userService.createFirebaseUser(dto.email);
 
     // Create if not exists (DB) - throw error if exists
     const user = await this.userService.createUnverifiedCustomer(

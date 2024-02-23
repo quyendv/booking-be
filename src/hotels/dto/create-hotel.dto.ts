@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsEmail,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -10,6 +11,10 @@ import {
 import { AddressDto } from '~/address/dto/address.dto';
 
 export class CreateHotelDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
   @IsNotEmpty()
   @IsString()
   name: string;
