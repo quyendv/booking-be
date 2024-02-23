@@ -10,7 +10,6 @@ import { UserService } from '~/users/user.service';
 export class RolesGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly userService: UserService,
     private readonly abilityFactory: AbilityFactory,
   ) {}
 
@@ -21,13 +20,9 @@ export class RolesGuard implements CanActivate {
     ]);
 
     if (!requiredRoles || requiredRoles.length === 0) return true;
-
     const request = context.switchToHttp().getRequest<RequestWithUser>();
-    const currentUser = await this.userService.getUserByEmail(request.user.email);
 
-    if (!currentUser) return false;
-
-    const ability = this.abilityFactory.defineAbility(currentUser);
+    const ability = await this.abilityFactory.getAbilityByEmail(request.user.email);
     return requiredRoles.every((requiredRole) => ability.can(...requiredRole));
   }
 }

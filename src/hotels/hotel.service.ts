@@ -36,6 +36,12 @@ export class HotelService extends BaseService<HotelEntity> {
     return hotel;
   }
 
+  async getHotelByEmail(email: string): Promise<HotelEntity> {
+    const hotel = await this.findOne({ where: { email } });
+    if (!hotel) throw new NotFoundException('Hotel not found');
+    return hotel;
+  }
+
   async updateHotel(id: number, data: UpdateHotelDto): Promise<HotelEntity> {
     const hotel = await this.getHotelById(id);
 

@@ -25,6 +25,12 @@ export class CustomerService extends BaseService<CustomerEntity> {
     super(repository);
   }
 
+  async getCustomerByEmail(email: string): Promise<CustomerEntity> {
+    const customer = await this.findById(email, { relations: { address: true } });
+    if (!customer) throw new NotFoundException('Customer not found.');
+    return customer;
+  }
+
   async createCustomer(
     dto: CreateCustomerDto,
     avatarInfo?: StorageFileInfo,

@@ -1,6 +1,8 @@
 import { AbilityBuilder, createMongoAbility, ExtractSubjectType } from '@casl/ability';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CustomerEntity } from '~/customers/entities/customer.entity';
+import { HotelEntity } from '~/hotels/entities/hotel.entity';
+import { HotelService } from '~/hotels/hotel.service';
 import { RoleTypes } from '~/users/constants/user.constant';
 import { UserEntity } from '~/users/entities/user.entity';
 import { UserService } from '~/users/user.service';
@@ -10,11 +12,16 @@ import {
   PermissionActions,
   PermissionSubjects,
 } from '../types/role.type';
+import { RoomEntity } from '~/hotels/entities/room.entity';
 
 @Injectable()
 export class AbilityFactory {
-  constructor(private readonly userService: UserService) {}
-  defineAbility(user: UserEntity): AppAbility {
+  constructor(
+    private readonly userService: UserService,
+    private readonly hotelService: HotelService,
+  ) {}
+
+  async defineAbility(user: UserEntity): Promise<AppAbility> {
     const { can, cannot, build, rules } = new AbilityBuilder<AppAbility>(createMongoAbility);
     const role = user.roleName;
 
@@ -22,9 +29,17 @@ export class AbilityFactory {
       can(PermissionActions.MANAGE, 'all');
     }
 
+    if (role === RoleTypes.HOTEL) {
+      const hotel = await this.hotelService.getHotelByEmail(user.id);
+      can(PermissionActions.UPDATE, HotelEntity, { email: user.id });
+      can(PermissionActions.MANAGE, RoomEntity, { hotelId: hotel.id });
+    }
+
     if (role === RoleTypes.CUSTOMER) {
       can(PermissionActions.UPDATE, CustomerEntity, { id: user.id });
     }
+    can(PermissionActions.READ, HotelEntity);
+    can(PermissionActions.READ, RoomEntity);
 
     return build({
       detectSubjectType: (item) => item.constructor as ExtractSubjectType<PermissionSubjects>,
