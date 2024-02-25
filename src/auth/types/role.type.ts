@@ -19,7 +19,7 @@ export enum PermissionActions {
 }
 
 export type PermissionSubjects = InferSubjects<
-  typeof CustomerEntity | typeof HotelEntity | typeof RoomEntity | 'all'
+  typeof CustomerEntity | typeof HotelEntity | typeof RoomEntity | 'firebase-account' | 'all'
 >;
 
 export type UserPermission = [PermissionActions, PermissionSubjects];

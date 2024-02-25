@@ -16,6 +16,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { UserPayload } from './types/request.type';
 import { RolesGuard } from './guards/role.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { Roles } from './decorators/role.decorator';
+import { PermissionActions } from './types/role.type';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -38,5 +40,11 @@ export class AuthController {
   @Public()
   verifyEmail(@Body() body: VerifyEmailDto): Promise<UserEntity> {
     return this.authService.verifyEmail(body.verifyToken);
+  }
+
+  @Post('firebase')
+  @Roles([PermissionActions.CREATE, 'firebase-account'])
+  createFirebaseAccount(@Body() body: { email: string }): Promise<void> {
+    return this.authService.createFirebaseAccount(body.email);
   }
 }

@@ -88,4 +88,8 @@ export class AuthService {
       throw error;
     }
   }
+
+  async createFirebaseAccount(email: string): Promise<void> {
+    return this.userService.createFirebaseUser(email);
+  }
 }
