@@ -25,12 +25,18 @@ export class VnProvinceService {
       .select('p.code', 'provinceCode')
       // .addSelect('p.name', 'provinceName')
       .addSelect('p.full_name', 'provinceFullname')
+      .addSelect('p.full_name_en', 'provinceFullnameEn')
+
       .addSelect('d.code', 'districtCode')
       // .addSelect('d.name', 'districtName')
       .addSelect('d.full_name', 'districtFullname')
+      .addSelect('d.full_name_en', 'districtFullnameEn')
+
       .addSelect('w.code', 'wardCode')
       // .addSelect('w.name', 'wardName')
       .addSelect('w.full_name', 'wardFullname')
+      .addSelect('w.full_name_en', 'wardFullnameEn')
+
       .from('provinces', 'p')
       .leftJoin('districts', 'd', 'd.province_code = p.code')
       .leftJoin('wards', 'w', 'w.district_code = d.code')
@@ -57,11 +63,13 @@ export class VnProvinceService {
         const wards = districtGroupItem.map((ward) => ({
           code: ward.wardCode,
           name: ward.wardFullname,
+          nameEn: ward.wardFullnameEn,
         }));
 
         return {
           code: district.districtCode,
           name: district.districtFullname,
+          nameEn: district.districtFullnameEn,
           wards,
         };
       });
@@ -69,6 +77,7 @@ export class VnProvinceService {
       return {
         code: province.provinceCode,
         name: province.provinceFullname,
+        nameEn: province.provinceFullnameEn,
         districts,
       };
     });

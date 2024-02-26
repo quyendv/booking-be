@@ -9,6 +9,8 @@ import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { RoomEntity } from './entities/room.entity';
+import { AuthUser } from '~/auth/decorators/user.decorator';
+import { UserPayload } from '~/auth/types/request.type';
 
 @ApiTags('Hotels')
 @Controller('hotels')
@@ -20,6 +22,12 @@ export class HotelController {
   @Roles([PermissionActions.CREATE, HotelEntity])
   createHotel(@Body() body: CreateHotelDto): Promise<HotelEntity> {
     return this.hotelService.createHotel(body);
+  }
+
+  @Get('me')
+  @Roles([PermissionActions.READ, HotelEntity])
+  getCurrentHotel(@AuthUser() user: UserPayload): Promise<HotelEntity> {
+    return this.hotelService.getHotelByEmail(user.email);
   }
 
   @Patch(':id')

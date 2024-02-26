@@ -5,9 +5,11 @@ import { VnProvince } from './types/vn-provinces.type';
 import { AuthGuard } from '~/auth/guards/auth.guard';
 import { Public } from '~/auth/decorators/public.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { RolesGuard } from '~/auth/guards/role.guard';
 
 @ApiTags('Address')
 @Controller('addresses')
+@UseGuards(AuthGuard, RolesGuard)
 @UseGuards(AuthGuard)
 export class AddressController {
   constructor(

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
@@ -18,7 +18,7 @@ export class HotelService extends BaseService<HotelEntity> {
   constructor(
     @InjectRepository(HotelEntity) repository: Repository<HotelEntity>,
     private readonly roomService: RoomService,
-    private readonly userService: UserService,
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
     private readonly storageService: StorageService,
   ) {
     super(repository);

@@ -7,6 +7,7 @@ import {
   Post,
   UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -14,9 +15,12 @@ import { ApiTags } from '@nestjs/swagger';
 import { StorageUploadDto, UploadByUrlDto } from './dto/storage.dto';
 import { StorageService } from './storage.service';
 import { StorageUploadResult } from './types/storage.type';
+import { AuthGuard } from '~/auth/guards/auth.guard';
+import { RolesGuard } from '~/auth/guards/role.guard';
 
 @ApiTags('Storage')
 @Controller('storage')
+@UseGuards(AuthGuard, RolesGuard)
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
 
