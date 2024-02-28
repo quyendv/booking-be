@@ -31,13 +31,13 @@ export class HotelService extends BaseService<HotelEntity> {
   }
 
   async getHotelById(id: number): Promise<HotelEntity> {
-    const hotel = await this.findById(id);
+    const hotel = await this.findById(id, { relations: { rooms: true } });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }
 
   async getHotelByEmail(email: string): Promise<HotelEntity> {
-    const hotel = await this.findOne({ where: { email } });
+    const hotel = await this.findOne({ where: { email }, relations: { rooms: true } });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }

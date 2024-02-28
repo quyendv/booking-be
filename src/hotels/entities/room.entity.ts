@@ -43,7 +43,7 @@ export class RoomEntity extends SequenceBaseEntity {
 
   @Column('decimal', {
     name: 'breakfast_price',
-    precision: 7,
+    precision: 14,
     scale: 2,
     transformer: new ColumnNumericTransformer(),
   })
@@ -51,7 +51,7 @@ export class RoomEntity extends SequenceBaseEntity {
 
   @Column('decimal', {
     name: 'room_price',
-    precision: 10,
+    precision: 14,
     scale: 2,
     transformer: new ColumnNumericTransformer(),
   })
