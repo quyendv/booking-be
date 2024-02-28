@@ -1,4 +1,10 @@
-import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
@@ -12,6 +18,7 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { UserService } from '~/users/user.service';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { RoleTypes } from '~/users/constants/user.constant';
+import { BaseResponse } from '~/base/types/response.type';
 
 @Injectable()
 export class HotelService extends BaseService<HotelEntity> {
@@ -65,6 +72,24 @@ export class HotelService extends BaseService<HotelEntity> {
 
   async updateRoom(roomId: number, data: UpdateRoomDto): Promise<RoomEntity> {
     return this.roomService.updateOne(roomId, data);
+  }
+
+  async deleteRoom(roomId: number): Promise<BaseResponse> {
+    const room = await this.roomService.findById(roomId);
+    if (!room) throw new NotFoundException('Room not found');
+
+    if (room.imageKey) await this.storageService.delete(room.imageKey);
+    // TODO: remove gallery images
+
+    try {
+      const response = await this.roomService.permanentDelete(roomId);
+      if (response.affected === 0) {
+        return { status: 'failure', message: 'Delete failed. Check query again.' };
+      }
+      return { status: 'success', message: 'Room deleted successfully' };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   async listHotelRooms(hotelId: number): Promise<RoomEntity[]> {

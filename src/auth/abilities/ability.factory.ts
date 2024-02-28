@@ -32,7 +32,11 @@ export class AbilityFactory {
     if (role === RoleTypes.HOTEL) {
       const hotel = await this.hotelService.getHotelByEmail(user.id);
       can(PermissionActions.UPDATE, HotelEntity, { email: user.id });
+      can(PermissionActions.UPDATE, HotelEntity, { id: hotel.id });
       can(PermissionActions.MANAGE, RoomEntity, { hotelId: hotel.id });
+      can(PermissionActions.MANAGE, RoomEntity, {
+        id: { $in: hotel.rooms.map((room) => room.id) },
+      });
     }
 
     if (role === RoleTypes.CUSTOMER) {

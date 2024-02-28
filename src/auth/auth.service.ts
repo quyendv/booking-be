@@ -61,7 +61,7 @@ export class AuthService {
       payload.email,
       await this.generateVerifiedLink(payload),
     );
-    return { message: 'Verification email sent' };
+    return { status: 'success', message: 'Verification email sent' };
   }
 
   private async generateVerifiedLink(payload: UserPayload): Promise<string> {
