@@ -15,6 +15,7 @@ import { AddressModule } from './address/address.module';
 import { StorageModule } from './storage/storage.module';
 import { HotelModule } from './hotels/hotel.module';
 import { PaymentModule } from './payment/payment.module';
+import { BookingModule } from './bookings/booking.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { PaymentModule } from './payment/payment.module';
     AddressModule,
     HotelModule,
     PaymentModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [

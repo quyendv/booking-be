@@ -64,7 +64,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
       gender: dto.gender,
       address: dto.address
         ? {
-            id: customer.address_id || (undefined as any),
+            id: customer.addressId || (undefined as any),
             ...dto.address,
           }
         : undefined,
@@ -112,7 +112,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
       avatarKey: !file ? undefined : uploadResult ? uploadResult.key : null,
       address: dto.address
         ? {
-            id: customer.address_id || (undefined as any),
+            id: customer.addressId || (undefined as any),
             ...dto.address,
           }
         : undefined,

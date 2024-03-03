@@ -1,9 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { SequenceBaseEntity } from '~/base/a.base.entity';
 import { ColumnNumericTransformer } from '~/base/transformers/numeric.transformer';
 import { HotelEntity } from './hotel.entity';
 import { GalleryItem } from '../types/gallery.type';
 import { Exclude } from 'class-transformer';
+import { BookingEntity } from '~/bookings/entities/booking.entity';
 
 @Entity('hotel_rooms')
 export class RoomEntity extends SequenceBaseEntity {
@@ -86,6 +87,9 @@ export class RoomEntity extends SequenceBaseEntity {
 
   @Column('bool', { name: 'sound_proofed', default: false })
   soundProofed: boolean;
+
+  @OneToMany(() => BookingEntity, (booking) => booking.room)
+  bookings: BookingEntity[];
 
   // Foreign Keys
   @Exclude({ toPlainOnly: true })
