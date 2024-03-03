@@ -1,5 +1,5 @@
 import { ForbiddenError } from '@casl/ability';
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
 import { Roles } from '~/auth/decorators/role.decorator';
@@ -17,6 +17,7 @@ import { HotelEntity } from './entities/hotel.entity';
 import { RoomEntity } from './entities/room.entity';
 import { HotelService } from './hotel.service';
 import { RoomService } from './sub-services/room.service';
+import { Public } from '~/auth/decorators/public.decorator';
 
 @ApiTags('Hotels')
 @Controller('hotels')
@@ -61,9 +62,10 @@ export class HotelController {
   }
 
   @Get()
-  @Roles([PermissionActions.LIST, HotelEntity])
+  @Public()
+  // @Roles([PermissionActions.LIST, HotelEntity])
   listHotels(): Promise<HotelEntity[]> {
-    return this.hotelService.findAll();
+    return this.hotelService.findAll({ relations: { rooms: true } });
   }
 
   @Post(':id/rooms')

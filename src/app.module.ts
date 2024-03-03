@@ -14,6 +14,7 @@ import { CustomerModule } from './customers/customer.module';
 import { AddressModule } from './address/address.module';
 import { StorageModule } from './storage/storage.module';
 import { HotelModule } from './hotels/hotel.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { HotelModule } from './hotels/hotel.module';
     CustomerModule,
     AddressModule,
     HotelModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [
