@@ -50,7 +50,7 @@ export class CreateBookingDto {
   @Type(() => Number)
   totalPrice: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(PaymentChannel)
-  paymentChannel: PaymentChannel;
+  paymentChannel: PaymentChannel = PaymentChannel.VN_PAY;
 }

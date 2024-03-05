@@ -1,3 +1,9 @@
+export enum VNPayBankCode {
+  VNPAYQR = 'VNPAYQR',
+  VNBANK = 'VNBANK',
+  INTCARD = 'INTCARD',
+}
+
 export enum PaymentChannel {
   // COD = 'COD',
   // BANK = 'BANK',

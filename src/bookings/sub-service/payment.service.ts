@@ -8,6 +8,7 @@ import { DateUtils } from '~/base/utils/date.utils';
 import { PaymentUtils } from '../utils/payment.utils';
 import { BookingService } from '../booking.service';
 import { CreatePaymentUrlDto } from '../dto/create-payment-url.dto';
+import { DEFAULT_LOCALE } from '~/base/constants/locale.constant';
 
 @Injectable()
 export class PaymentService {
@@ -45,14 +46,11 @@ export class PaymentService {
     let vnpUrl = config.vnp_Url;
     const returnUrl = config.vnp_ReturnUrl;
 
-    // const orderId = createDate; // moment(date).format('DDHHmmss');
-    // const amount = 10000;
-
-    const orderId = booking.paymentId;
+    const orderId = booking.paymentId; // NOTE: can customize & save paymentId
     const amount = booking.totalPrice;
 
-    const bankCode = dto.bankCode; // req.body?.bankCode ?? '';
-    const locale = dto.locale; // req.body?.language;
+    const bankCode = dto.bankCode;
+    const locale = dto.locale;
 
     const currCode = 'VND';
     let vnp_Params: any = {};
@@ -75,18 +73,19 @@ export class PaymentService {
     vnp_Params = PaymentUtils.sortAndEncodeObject(vnp_Params);
 
     const signData = qs.stringify(vnp_Params, { encode: false });
-
     const hmac = crypto.createHmac('sha512', secretKey);
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
+
     vnp_Params['vnp_SecureHash'] = signed;
     vnpUrl += '?' + qs.stringify(vnp_Params, { encode: false });
 
-    return { status: 'success', data: vnpUrl }; // return { url: vnpUrl }; // for redirect
+    return { status: 'success', data: vnpUrl };
   }
 
-  async vnpayPaymentResult(req: Request) {
+  async vnpayPaymentResult(req: Request): Promise<{ url: string }> {
     let vnp_Params = req.query;
 
+    const originalQueryParams = <object>vnp_Params; // already decoded to json object // can parse with qs
     const secureHash = vnp_Params['vnp_SecureHash'];
 
     delete vnp_Params['vnp_SecureHash'];
@@ -100,24 +99,31 @@ export class PaymentService {
       vnp_Url: 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
       vnp_Api: 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction',
     };
-    const tmnCode = config.vnp_TmnCode;
+    // const tmnCode = config.vnp_TmnCode;
     const secretKey = config.vnp_HashSecret;
+    const orderId = <string>vnp_Params['vnp_TxnRef']; // paymentId
 
     const signData = qs.stringify(vnp_Params, { encode: false });
     const hmac = crypto.createHmac('sha512', secretKey);
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
-    console.log(vnp_Params['vnp_ResponseCode']);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    const resultUrl = `${this.configService.getOrThrow<string>(
+      'environment.clientURL',
+    )}/${DEFAULT_LOCALE}/book-room/result?channel=vn_pay`;
+    let vnpayCode = vnp_Params['vnp_ResponseCode'];
 
     if (secureHash === signed) {
-      //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
+      const updateResult = await this.bookingService.update(
+        { paymentId: orderId },
+        { isPaid: true, paymentInfo: originalQueryParams },
+      );
 
-      return { url: `localhost:3000?code=${vnp_Params['vnp_ResponseCode']}` };
-      // res.render('success', { code: vnp_Params['vnp_ResponseCode'] });
+      if (updateResult.affected !== 1) vnpayCode = '100'; // custom: internal error, update failed
+      // See more: https://sandbox.vnpayment.vn/apis/docs/bang-ma-loi/
+
+      return { url: `${resultUrl}&code=${vnpayCode}` };
     } else {
-      return { url: 'localhost:3000?code=97' };
-      // res.render('success', { code: '97' });
+      return { url: `${resultUrl}&code=97` };
     }
   }
 }

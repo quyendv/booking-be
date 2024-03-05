@@ -51,22 +51,7 @@ export class BookingController {
   @Redirect()
   @Public()
   @Get('payment/return/vnpay')
-  async vnpayPaymentResult(@Req() req: Request) {
-    const vnp_Params = req.query;
-
-    console.log(vnp_Params['vnp_ResponseCode']);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    return { url: `http://localhost:3000?code=${vnp_Params['vnp_ResponseCode']}` };
-
-    // if (secureHash === signed) {
-    //   //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-
-    //   return { url: `localhost:3000?code=${vnp_Params['vnp_ResponseCode']}` };
-    //   // res.render('success', { code: vnp_Params['vnp_ResponseCode'] });
-    // } else {
-    //   return { url: 'localhost:3000?code=97' };
-    //   // res.render('success', { code: '97' });
-    // }
-    // return this.paymentService.vnpayPaymentResult(req);
+  async vnpayPaymentResult(@Req() req: Request): Promise<{ url: string }> {
+    return this.paymentService.vnpayPaymentResult(req);
   }
 }

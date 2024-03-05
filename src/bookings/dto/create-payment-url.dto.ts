@@ -1,11 +1,6 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { Locales } from '~/base/constants/locale.constant';
-
-enum VNPayBankCode {
-  VNPAYQR = 'VNPAYQR',
-  VNBANK = 'VNBANK',
-  INTCARD = 'INTCARD',
-}
+import { VNPayBankCode } from '../constants/booking.constant';
 
 export class CreatePaymentUrlDto {
   // @ApiProperty()

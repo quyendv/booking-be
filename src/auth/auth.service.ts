@@ -7,6 +7,7 @@ import { IEnvironmentConfig } from '~/configs/env.config';
 import { UserEntity } from '~/users/entities/user.entity';
 import { UserService } from '~/users/user.service';
 import { UserPayload } from './types/request.type';
+import { DEFAULT_LOCALE } from '~/base/constants/locale.constant';
 
 @Injectable()
 export class AuthService {
@@ -67,7 +68,7 @@ export class AuthService {
   private async generateVerifiedLink(payload: UserPayload): Promise<string> {
     const { clientURL, jwtSecret } = <IEnvironmentConfig>this.configService.get('environment');
     const token = await this.jwtService.signAsync(payload, { secret: jwtSecret, expiresIn: '2d' });
-    return `${clientURL}/en/verify-email?token=${token}`; // TODO: should be dynamic
+    return `${clientURL}/${DEFAULT_LOCALE}/verify-email?token=${token}`; // TODO: should be dynamic
   }
 
   async verifyEmail(token: string): Promise<UserEntity> {

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
@@ -19,10 +24,21 @@ export class BookingService extends BaseService<BookingEntity> {
     super(repository);
   }
 
-  async getBookingById(id: string): Promise<BookingEntity> {
+  async getBookingById(id: string, isPaid?: boolean): Promise<BookingEntity> {
     const booking = await this.findById(id);
     if (!booking) {
       throw new NotFoundException(`Booking ${id} not found`);
+    }
+    if (isPaid !== undefined && booking.isPaid !== isPaid) {
+      throw new ConflictException(`Booking payment status is ${isPaid ? 'paid' : 'unpaid'}`);
+    }
+    return booking;
+  }
+
+  async getBookingByPaymentId(paymentId: string): Promise<BookingEntity> {
+    const booking = await this.findOne({ where: { paymentId } });
+    if (!booking) {
+      throw new NotFoundException(`Booking with paymentId ${paymentId} not found`);
     }
     return booking;
   }

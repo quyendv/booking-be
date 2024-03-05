@@ -58,7 +58,7 @@ export class HotelController {
   @Get(':id')
   @Roles([PermissionActions.GET, HotelEntity])
   getHotel(@Param('id') id: string): Promise<HotelEntity> {
-    return this.hotelService.getHotelById(+id);
+    return this.hotelService.getHotelById(+id, { bookings: true });
   }
 
   @Get()
