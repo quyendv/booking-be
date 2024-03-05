@@ -19,6 +19,14 @@ export class BookingService extends BaseService<BookingEntity> {
     super(repository);
   }
 
+  async getBookingById(id: string): Promise<BookingEntity> {
+    const booking = await this.findById(id);
+    if (!booking) {
+      throw new NotFoundException(`Booking ${id} not found`);
+    }
+    return booking;
+  }
+
   async createBooking(dto: CreateBookingDto, customerEmail: string): Promise<BookingEntity> {
     // TODO: validate start, end date; total price
 
@@ -51,6 +59,7 @@ export class BookingService extends BaseService<BookingEntity> {
       isPaid: false,
       paymentId,
     });
+
     return booking;
   }
 
