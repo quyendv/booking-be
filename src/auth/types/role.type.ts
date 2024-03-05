@@ -1,4 +1,5 @@
 import { InferSubjects, MongoAbility, createAliasResolver } from '@casl/ability';
+import { BookingEntity } from '~/bookings/entities/booking.entity';
 import { CustomerEntity } from '~/customers/entities/customer.entity';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
 import { RoomEntity } from '~/hotels/entities/room.entity';
@@ -19,7 +20,12 @@ export enum PermissionActions {
 }
 
 export type PermissionSubjects = InferSubjects<
-  typeof CustomerEntity | typeof HotelEntity | typeof RoomEntity | 'firebase-account' | 'all'
+  | typeof CustomerEntity
+  | typeof HotelEntity
+  | typeof RoomEntity
+  | typeof BookingEntity
+  | 'firebase-account'
+  | 'all'
 >;
 
 export type UserPermission = [PermissionActions, PermissionSubjects];

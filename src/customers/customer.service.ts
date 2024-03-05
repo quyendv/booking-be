@@ -1,8 +1,7 @@
-import { Inject, Injectable, Logger, NotFoundException, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as admin from 'firebase-admin';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
 import { CommonUtils } from '~/base/utils/common.utils';
 import { StorageFolders } from '~/storage/constants/storage.constant';
@@ -25,8 +24,11 @@ export class CustomerService extends BaseService<CustomerEntity> {
     super(repository);
   }
 
-  async getCustomerByEmail(email: string): Promise<CustomerEntity> {
-    const customer = await this.findById(email, { relations: { address: true } });
+  async getCustomerByEmail(
+    email: string,
+    options?: FindOneOptions<CustomerEntity>,
+  ): Promise<CustomerEntity> {
+    const customer = await this.findById(email, options);
     if (!customer) throw new NotFoundException('Customer not found.');
     return customer;
   }

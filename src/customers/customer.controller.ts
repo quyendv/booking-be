@@ -129,6 +129,6 @@ export class CustomerController {
         PermissionActions.UPDATE,
         this.customerService.createInstance({ id: user.email }),
       );
-    return this.customerService.getCustomerByEmail(user.email);
+    return this.customerService.getCustomerByEmail(user.email, { relations: { address: true } });
   }
 }

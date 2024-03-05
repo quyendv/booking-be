@@ -13,6 +13,7 @@ import {
   PermissionSubjects,
 } from '../types/role.type';
 import { RoomEntity } from '~/hotels/entities/room.entity';
+import { BookingEntity } from '~/bookings/entities/booking.entity';
 
 @Injectable()
 export class AbilityFactory {
@@ -41,6 +42,7 @@ export class AbilityFactory {
 
     if (role === RoleTypes.CUSTOMER) {
       can(PermissionActions.UPDATE, CustomerEntity, { id: user.id });
+      if (user.isVerified) can(PermissionActions.MANAGE, BookingEntity);
     }
     can(PermissionActions.READ, HotelEntity);
     can(PermissionActions.READ, RoomEntity);
