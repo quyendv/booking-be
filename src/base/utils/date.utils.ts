@@ -164,7 +164,7 @@ export class DateUtils {
     return date;
   }
 
-  static getNextDaysOf(strDate: string): string {
+  static getTomorrowOf(strDate: string): string {
     return DateUtils.formatDateToYYYYMMDD(DateUtils.addDays(strDate, 1));
   }
 
@@ -281,7 +281,7 @@ export class DateUtils {
 
     while (DateUtils.isAfter(endDate, currentEnd)) {
       intervals.push([currentStart, currentEnd]);
-      currentStart = DateUtils.getNextDaysOf(currentEnd);
+      currentStart = DateUtils.getTomorrowOf(currentEnd);
       currentEnd = DateUtils.getAfterDaysOf(currentStart, interval - 1);
     }
 
@@ -315,5 +315,20 @@ export class DateUtils {
       startDate = new Date(year, month + 1, 1); // always set from [startDate, lastDateOfMonth]
     }
     return result;
+  }
+
+  static checkTimeRangeOverlap(
+    target: { start: string; end: string },
+    rangesToCheck: { start: string; end: string }[],
+  ): boolean {
+    for (const range of rangesToCheck) {
+      if (
+        DateUtils.isBetween(target.start, range.start, range.end) ||
+        DateUtils.isBetween(target.end, range.start, range.end)
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 }
