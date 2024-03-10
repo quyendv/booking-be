@@ -1,7 +1,19 @@
 import { ForbiddenError } from '@casl/ability';
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
+import { Public } from '~/auth/decorators/public.decorator';
 import { Roles } from '~/auth/decorators/role.decorator';
 import { AuthUser } from '~/auth/decorators/user.decorator';
 import { AuthGuard } from '~/auth/guards/auth.guard';
@@ -17,10 +29,10 @@ import { HotelEntity } from './entities/hotel.entity';
 import { RoomEntity } from './entities/room.entity';
 import { HotelService } from './hotel.service';
 import { RoomService } from './sub-services/room.service';
-import { Public } from '~/auth/decorators/public.decorator';
 
 @ApiTags('Hotels')
 @Controller('hotels')
+@UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard, RolesGuard)
 export class HotelController {
   constructor(

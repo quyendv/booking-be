@@ -1,6 +1,17 @@
-import { Body, Controller, Get, Post, Redirect, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Post,
+  Redirect,
+  Req,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { Public } from '~/auth/decorators/public.decorator';
 import { Roles } from '~/auth/decorators/role.decorator';
 import { AuthUser, GetUser } from '~/auth/decorators/user.decorator';
 import { AuthGuard } from '~/auth/guards/auth.guard';
@@ -8,16 +19,16 @@ import { RolesGuard } from '~/auth/guards/role.guard';
 import { UserPayload } from '~/auth/types/request.type';
 import { PermissionActions } from '~/auth/types/role.type';
 import { BaseResponse } from '~/base/types/response.type';
+import { UserEntity } from '~/users/entities/user.entity';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { CreatePaymentUrlDto } from './dto/create-payment-url.dto';
 import { BookingEntity } from './entities/booking.entity';
 import { PaymentService } from './sub-service/payment.service';
-import { Public } from '~/auth/decorators/public.decorator';
-import { CreatePaymentUrlDto } from './dto/create-payment-url.dto';
-import { UserEntity } from '~/users/entities/user.entity';
 
 @ApiTags('Bookings')
 @Controller('bookings')
+@UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard, RolesGuard)
 export class BookingController {
   constructor(

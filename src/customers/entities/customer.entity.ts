@@ -4,6 +4,7 @@ import { AddressEntity } from '~/address/entities/address.entity';
 import { TimestampEntity } from '~/base/a.base.entity';
 import { GenderTypes } from '../constants/customer.constant';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
+import { ReviewEntity } from '~/bookings/entities/review.entity';
 
 @Entity('customers')
 export class CustomerEntity extends TimestampEntity {
@@ -34,6 +35,9 @@ export class CustomerEntity extends TimestampEntity {
 
   @OneToMany(() => BookingEntity, (booking) => booking.customer)
   bookings: BookingEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.customer)
+  reviews: ReviewEntity[];
 
   // Foreign Keys
   @Exclude({ toPlainOnly: true })

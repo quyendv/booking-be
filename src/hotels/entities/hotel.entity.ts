@@ -4,6 +4,7 @@ import { SequenceBaseEntity } from '~/base/a.base.entity';
 import { GalleryItem } from '../types/gallery.type';
 import { RoomEntity } from './room.entity';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
+import { ReviewEntity } from '~/bookings/entities/review.entity';
 
 @Entity('hotels')
 export class HotelEntity extends SequenceBaseEntity {
@@ -67,4 +68,7 @@ export class HotelEntity extends SequenceBaseEntity {
 
   @OneToMany(() => BookingEntity, (booking) => booking.hotel)
   bookings: BookingEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.hotel)
+  reviews: ReviewEntity[];
 }

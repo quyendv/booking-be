@@ -5,6 +5,7 @@ import { HotelEntity } from './hotel.entity';
 import { GalleryItem } from '../types/gallery.type';
 import { Exclude } from 'class-transformer';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
+import { ReviewEntity } from '~/bookings/entities/review.entity';
 
 @Entity('hotel_rooms')
 export class RoomEntity extends SequenceBaseEntity {
@@ -90,6 +91,9 @@ export class RoomEntity extends SequenceBaseEntity {
 
   @OneToMany(() => BookingEntity, (booking) => booking.room)
   bookings: BookingEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.room)
+  reviews: ReviewEntity[];
 
   // Foreign Keys
   @Exclude({ toPlainOnly: true })

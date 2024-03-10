@@ -10,7 +10,6 @@ import { RolesGuard } from '~/auth/guards/role.guard';
 @ApiTags('Address')
 @Controller('addresses')
 @UseGuards(AuthGuard, RolesGuard)
-@UseGuards(AuthGuard)
 export class AddressController {
   constructor(
     private readonly vnProvinceService: VnProvinceService,
