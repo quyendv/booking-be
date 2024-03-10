@@ -5,6 +5,7 @@ import { RoomEntity } from '~/hotels/entities/room.entity';
 import { BookingEntity } from './booking.entity';
 import { CustomerEntity } from '~/customers/entities/customer.entity';
 import { ColumnNumericTransformer } from '~/base/transformers/numeric.transformer';
+import { Expose } from 'class-transformer';
 
 @Entity({ name: 'reviews' })
 export class ReviewEntity extends UuidBaseEntity {
@@ -37,7 +38,7 @@ export class ReviewEntity extends UuidBaseEntity {
   // Rating info
   @Column('decimal', {
     name: 'staffRating',
-    precision: 2,
+    precision: 3,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -46,7 +47,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'facilityRating',
-    precision: 2,
+    precision: 3,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -55,7 +56,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'cleanlinessRating',
-    precision: 2,
+    precision: 3,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -64,7 +65,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'comfortRating',
-    precision: 2,
+    precision: 3,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -73,7 +74,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'valueForMoneyRating',
-    precision: 2,
+    precision: 3,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -82,7 +83,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'locationRating',
-    precision: 2,
+    precision: 3,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -91,6 +92,19 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('varchar', { name: 'comment', nullable: true })
   comment: string;
+
+  @Expose({ name: 'total' })
+  getTotalRating(): number {
+    return (
+      (this.staffRating +
+        this.facilityRating +
+        this.cleanlinessRating +
+        this.comfortRating +
+        this.valueForMoneyRating +
+        this.locationRating) /
+      6
+    );
+  }
 
   // Foreign keys
   @Column('varchar', { name: 'booking_id' })
