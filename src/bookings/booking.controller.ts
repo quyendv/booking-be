@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Redirect, Req, UseGuards } from '@nestjs/c
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Roles } from '~/auth/decorators/role.decorator';
-import { AuthUser } from '~/auth/decorators/user.decorator';
+import { AuthUser, GetUser } from '~/auth/decorators/user.decorator';
 import { AuthGuard } from '~/auth/guards/auth.guard';
 import { RolesGuard } from '~/auth/guards/role.guard';
 import { UserPayload } from '~/auth/types/request.type';
@@ -14,6 +14,7 @@ import { BookingEntity } from './entities/booking.entity';
 import { PaymentService } from './sub-service/payment.service';
 import { Public } from '~/auth/decorators/public.decorator';
 import { CreatePaymentUrlDto } from './dto/create-payment-url.dto';
+import { UserEntity } from '~/users/entities/user.entity';
 
 @ApiTags('Bookings')
 @Controller('bookings')
@@ -25,8 +26,9 @@ export class BookingController {
   ) {}
 
   @Get()
-  listBookings(): Promise<BookingEntity[]> {
-    return this.bookingService.findAll();
+  @Roles([PermissionActions.LIST, BookingEntity])
+  listMyBookings(@GetUser() user: UserEntity): Promise<BookingEntity[]> {
+    return this.bookingService.listMyBookings(user);
   }
 
   @Post()

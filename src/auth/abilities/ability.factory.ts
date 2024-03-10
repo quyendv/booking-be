@@ -38,6 +38,7 @@ export class AbilityFactory {
       can(PermissionActions.MANAGE, RoomEntity, {
         id: { $in: hotel.rooms.map((room) => room.id) },
       });
+      can(PermissionActions.READ, BookingEntity, { hotelId: hotel.id });
     }
 
     if (role === RoleTypes.CUSTOMER) {

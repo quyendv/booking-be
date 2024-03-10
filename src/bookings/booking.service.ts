@@ -13,6 +13,8 @@ import { HotelService } from '~/hotels/hotel.service';
 import { CustomerService } from '~/customers/customer.service';
 import { PaymentChannel } from './constants/booking.constant';
 import { CommonUtils } from '~/base/utils/common.utils';
+import { UserEntity } from '~/users/entities/user.entity';
+import { RoleTypes } from '~/users/constants/user.constant';
 
 @Injectable()
 export class BookingService extends BaseService<BookingEntity> {
@@ -84,6 +86,22 @@ export class BookingService extends BaseService<BookingEntity> {
       return `${paymentChannel}_${CommonUtils.getEmailName(customerEmail)}_${Date.now()}`;
     } else {
       throw new BadRequestException('Invalid payment channel');
+    }
+  }
+
+  async listMyBookings(user: UserEntity): Promise<BookingEntity[]> {
+    if (user.roleName === RoleTypes.CUSTOMER) {
+      return this.findAll({
+        where: { customerEmail: user.id },
+        relations: { room: true, hotel: true },
+      });
+    } else if (user.roleName === RoleTypes.HOTEL) {
+      return this.findAll({
+        where: { hotelOwnerEmail: user.id },
+        relations: { room: true, hotel: true },
+      });
+    } else {
+      throw new BadRequestException('Invalid user role');
     }
   }
 }
