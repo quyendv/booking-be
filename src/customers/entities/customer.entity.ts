@@ -4,7 +4,7 @@ import { AddressEntity } from '~/address/entities/address.entity';
 import { TimestampEntity } from '~/base/a.base.entity';
 import { GenderTypes } from '../constants/customer.constant';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
-import { ReviewEntity } from '~/bookings/entities/review.entity';
+import { ReviewEntity } from '~/reviews/entities/review.entity';
 
 @Entity('customers')
 export class CustomerEntity extends TimestampEntity {

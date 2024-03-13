@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { UuidBaseEntity } from '~/base/a.base.entity';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
 import { RoomEntity } from '~/hotels/entities/room.entity';
-import { BookingEntity } from './booking.entity';
+import { BookingEntity } from '../../bookings/entities/booking.entity';
 import { CustomerEntity } from '~/customers/entities/customer.entity';
 import { ColumnNumericTransformer } from '~/base/transformers/numeric.transformer';
 import { Expose } from 'class-transformer';

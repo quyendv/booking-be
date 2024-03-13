@@ -1,5 +1,6 @@
 import { InferSubjects, MongoAbility, createAliasResolver } from '@casl/ability';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
+import { ReviewEntity } from '~/reviews/entities/review.entity';
 import { CustomerEntity } from '~/customers/entities/customer.entity';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
 import { RoomEntity } from '~/hotels/entities/room.entity';
@@ -24,6 +25,7 @@ export type PermissionSubjects = InferSubjects<
   | typeof HotelEntity
   | typeof RoomEntity
   | typeof BookingEntity
+  | typeof ReviewEntity
   | 'firebase-account'
   | 'all'
 >;
@@ -37,3 +39,8 @@ export const aliasPermissionActions = createAliasResolver({
   [PermissionActions.READ]: [PermissionActions.GET, PermissionActions.LIST],
   [PermissionActions.WRITE]: [PermissionActions.MODIFY, PermissionActions.CREATE],
 });
+
+// Flat Type
+export type FlatReviewBookingCustomer = ReviewEntity & {
+  'booking.customerEmail': ReviewEntity['booking']['customerEmail'];
+};

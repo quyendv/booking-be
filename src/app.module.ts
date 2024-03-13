@@ -15,6 +15,7 @@ import { HotelModule } from './hotels/hotel.module';
 import { MailerModule } from './mailer/mailer.module';
 import { StorageModule } from './storage/storage.module';
 import { UserModule } from './users/user.module';
+import { ReviewModule } from './reviews/review.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { UserModule } from './users/user.module';
     AddressModule,
     HotelModule,
     BookingModule,
+    ReviewModule,
   ],
   controllers: [AppController],
   providers: [

@@ -7,7 +7,7 @@ import { HotelEntity } from '~/hotels/entities/hotel.entity';
 import { RoomEntity } from '~/hotels/entities/room.entity';
 import { BookingStatus, PaymentChannel, PaymentCurrency } from '../constants/booking.constant';
 import { PaymentInfo } from '../payment.type';
-import { ReviewEntity } from './review.entity';
+import { ReviewEntity } from '../../reviews/entities/review.entity';
 
 @Entity('bookings')
 export class BookingEntity extends UuidBaseEntity {

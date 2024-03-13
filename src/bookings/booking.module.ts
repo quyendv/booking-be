@@ -6,13 +6,12 @@ import { BookingController } from './booking.controller';
 import { BookingService } from './booking.service';
 import { BookingEntity } from './entities/booking.entity';
 import { PaymentService } from './sub-service/payment.service';
-import { ReviewEntity } from './entities/review.entity';
-import { ReviewService } from './sub-service/review.service';
+import { ReviewEntity } from '../reviews/entities/review.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([BookingEntity, ReviewEntity]), HotelModule, CustomerModule],
   controllers: [BookingController],
-  providers: [BookingService, PaymentService, ReviewService],
+  providers: [BookingService, PaymentService],
   exports: [BookingService],
 })
 export class BookingModule {}
