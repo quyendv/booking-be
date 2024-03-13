@@ -46,7 +46,10 @@ export class AbilityFactory {
     if (role === RoleTypes.CUSTOMER) {
       can(PermissionActions.UPDATE, CustomerEntity, { id: user.id });
       if (user.isVerified) {
-        can(PermissionActions.MANAGE, BookingEntity);
+        can(PermissionActions.CREATE, BookingEntity);
+        can([PermissionActions.READ, PermissionActions.UPDATE], BookingEntity, {
+          customerEmail: user.id,
+        });
         can<FlatReviewBookingCustomer>(PermissionActions.CREATE, ReviewEntity, {
           'booking.customerEmail': user.id,
         });

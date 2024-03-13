@@ -1,5 +1,10 @@
 import { ForbiddenError } from '@casl/ability';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AppAbility, PermissionActions } from '~/auth/types/role.type';
@@ -39,7 +44,7 @@ export class ReviewService extends BaseService<ReviewEntity> {
       throw new BadRequestException(`Booking ${dto.bookingId} is not completed`);
     }
 
-    return this.createOne({
+    const newReview = await this.createOne({
       ...dto,
       customerName: booking.customer.name,
       customerImage: booking.customer.avatar ?? undefined,
@@ -48,6 +53,15 @@ export class ReviewService extends BaseService<ReviewEntity> {
       hotelOwnerEmail: booking.hotelOwnerEmail,
       roomId: booking.roomId,
     });
+
+    const updateBookingResult = await this.bookingService.update(booking.id, {
+      status: BookingStatus.REVIEWED,
+    });
+    if (!updateBookingResult.affected) {
+      throw new InternalServerErrorException('Update booking failed.');
+    }
+
+    return newReview;
   }
 
   async updateReview(id: string, dto: UpdateReviewDto, ability: AppAbility): Promise<ReviewEntity> {

@@ -3,6 +3,8 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Redirect,
   Req,
@@ -25,6 +27,8 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { CreatePaymentUrlDto } from './dto/create-payment-url.dto';
 import { BookingEntity } from './entities/booking.entity';
 import { PaymentService } from './sub-service/payment.service';
+import { UpdateBookingDto } from './dto/update-booking.dto';
+import { AbilityFactory } from '~/auth/abilities/ability.factory';
 
 @ApiTags('Bookings')
 @Controller('bookings')
@@ -34,6 +38,7 @@ export class BookingController {
   constructor(
     private readonly bookingService: BookingService,
     private readonly paymentService: PaymentService,
+    private readonly abilityService: AbilityFactory,
   ) {}
 
   @Get()
@@ -49,6 +54,17 @@ export class BookingController {
     @Body() body: CreateBookingDto,
   ): Promise<BookingEntity> {
     return this.bookingService.createBooking(body, user.email);
+  }
+
+  @Patch(':id')
+  @Roles([PermissionActions.UPDATE, BookingEntity])
+  async updateBooking(
+    @Param('id') id: string,
+    @AuthUser() user: UserPayload,
+    @Body() body: UpdateBookingDto,
+  ): Promise<BaseResponse> {
+    const ability = await this.abilityService.getAbilityByEmail(user.email);
+    return this.bookingService.updateBooking(id, body, ability);
   }
 
   // @Redirect() // error CORS

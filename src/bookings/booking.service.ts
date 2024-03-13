@@ -1,20 +1,25 @@
+import { ForbiddenError } from '@casl/ability';
 import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { AppAbility, PermissionActions } from '~/auth/types/role.type';
 import { BaseService } from '~/base/a.base.service';
-import { BookingEntity } from './entities/booking.entity';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { HotelService } from '~/hotels/hotel.service';
-import { CustomerService } from '~/customers/customer.service';
-import { PaymentChannel } from './constants/booking.constant';
 import { CommonUtils } from '~/base/utils/common.utils';
-import { UserEntity } from '~/users/entities/user.entity';
+import { CustomerService } from '~/customers/customer.service';
+import { HotelService } from '~/hotels/hotel.service';
 import { RoleTypes } from '~/users/constants/user.constant';
+import { UserEntity } from '~/users/entities/user.entity';
+import { BookingStatus, PaymentChannel } from './constants/booking.constant';
+import { CreateBookingDto } from './dto/create-booking.dto';
+import { UpdateBookingDto } from './dto/update-booking.dto';
+import { BookingEntity } from './entities/booking.entity';
+import { BaseResponse } from '~/base/types/response.type';
 
 @Injectable()
 export class BookingService extends BaseService<BookingEntity> {
@@ -43,6 +48,38 @@ export class BookingService extends BaseService<BookingEntity> {
       throw new NotFoundException(`Booking with paymentId ${paymentId} not found`);
     }
     return booking;
+  }
+
+  async updateBooking(
+    id: string,
+    dto: UpdateBookingDto,
+    ability: AppAbility,
+  ): Promise<BaseResponse> {
+    const booking = await this.findById(id);
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+    ForbiddenError.from(ability)
+      .setMessage('Admin or Owner Hotel/Customer can update booking.')
+      .throwUnlessCan(PermissionActions.UPDATE, booking);
+
+    if (dto.status) {
+      // TODO: validate strictly (not allow 'reviewed', ...)
+      const nextStatuses = CommonUtils.getNextEnumValues(BookingStatus, booking.status, true);
+      if (!nextStatuses.includes(dto.status)) {
+        throw new BadRequestException(`Cannot change from "${booking.status}" to "${dto.status}"`);
+      }
+    }
+
+    const updateResult = await this.update(id, { ...dto });
+    if (updateResult.affected && updateResult.affected > 0) {
+      return {
+        status: 'success',
+        message: 'Update booking successfully',
+      };
+    } else {
+      throw new InternalServerErrorException('Something went wrong.');
+    }
   }
 
   async createBooking(dto: CreateBookingDto, customerEmail: string): Promise<BookingEntity> {
