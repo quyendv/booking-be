@@ -49,6 +49,6 @@ export enum BookingStatus {
   BOOKED = 'booked', // paid
   CHECKED_IN = 'checked_in',
   CHECKED_OUT = 'checked_out',
-  COMPLETED = 'completed',
+  // COMPLETED = 'completed', // checked_out is completed
   REVIEWED = 'reviewed',
 }

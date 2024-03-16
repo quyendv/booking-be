@@ -40,7 +40,7 @@ export class ReviewService extends BaseService<ReviewEntity> {
       .setMessage('Admin or Owner Booking can add reviews.')
       .throwUnlessCan(PermissionActions.CREATE, this.createInstance({ booking }));
 
-    if (booking.status !== BookingStatus.COMPLETED) {
+    if (booking.status !== BookingStatus.CHECKED_OUT) {
       throw new BadRequestException(`Booking ${dto.bookingId} is not completed`);
     }
 
