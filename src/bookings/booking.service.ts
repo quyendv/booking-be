@@ -130,12 +130,12 @@ export class BookingService extends BaseService<BookingEntity> {
     if (user.roleName === RoleTypes.CUSTOMER) {
       return this.findAll({
         where: { customerEmail: user.id },
-        relations: { room: true, hotel: true },
+        relations: { room: true, hotel: true, review: true },
       });
     } else if (user.roleName === RoleTypes.HOTEL) {
       return this.findAll({
         where: { hotelOwnerEmail: user.id },
-        relations: { room: true, hotel: true },
+        relations: { room: true, hotel: true, review: true },
       });
     } else {
       throw new BadRequestException('Invalid user role');
