@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import {
   CreateDateColumn,
   DeleteDateColumn,
@@ -14,7 +14,8 @@ export abstract class TimestampEntity {
     default: () => 'CURRENT_TIMESTAMP()',
     name: 'created_at',
   })
-  @Exclude({ toPlainOnly: true })
+  // @Exclude({ toPlainOnly: true })
+  @Expose({ name: 'createdAt', groups: ['timestamptz', 'created'] })
   createdAt: Date;
 
   @UpdateDateColumn({
@@ -22,11 +23,13 @@ export abstract class TimestampEntity {
     default: () => 'CURRENT_TIMESTAMP()',
     name: 'updated_at',
   })
-  @Exclude({ toPlainOnly: true })
+  // @Exclude({ toPlainOnly: true })
+  @Expose({ name: 'updatedAt', groups: ['timestamptz', 'updated'] })
   updatedAt: Date;
 
   @DeleteDateColumn({ type: 'timestamptz', name: 'deleted_at' })
-  @Exclude({ toPlainOnly: true })
+  // @Exclude({ toPlainOnly: true })
+  @Expose({ name: 'deletedAt', groups: ['timestamptz', 'deleted'] })
   deletedAt: Date;
 }
 
@@ -36,12 +39,12 @@ export abstract class ABaseEntity extends TimestampEntity {
   id: EntityId;
 }
 
-export abstract class UuidBaseEntity extends ABaseEntity {
+export class UuidBaseEntity extends ABaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string; // EntityId
 }
 
-export abstract class SequenceBaseEntity extends ABaseEntity {
+export class SequenceBaseEntity extends ABaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number; // EntityId
 }

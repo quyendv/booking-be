@@ -1,7 +1,19 @@
 import { ForbiddenError } from '@casl/ability';
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
+import { Public } from '~/auth/decorators/public.decorator';
 import { Roles } from '~/auth/decorators/role.decorator';
 import { AuthUser } from '~/auth/decorators/user.decorator';
 import { AuthGuard } from '~/auth/guards/auth.guard';
@@ -20,6 +32,7 @@ import { RoomService } from './sub-services/room.service';
 
 @ApiTags('Hotels')
 @Controller('hotels')
+@UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard, RolesGuard)
 export class HotelController {
   constructor(
@@ -57,13 +70,14 @@ export class HotelController {
   @Get(':id')
   @Roles([PermissionActions.GET, HotelEntity])
   getHotel(@Param('id') id: string): Promise<HotelEntity> {
-    return this.hotelService.getHotelById(+id);
+    return this.hotelService.getHotelById(+id, { bookings: true });
   }
 
   @Get()
-  @Roles([PermissionActions.LIST, HotelEntity])
+  @Public()
+  // @Roles([PermissionActions.LIST, HotelEntity])
   listHotels(): Promise<HotelEntity[]> {
-    return this.hotelService.findAll();
+    return this.hotelService.findAll({ relations: { rooms: true } });
   }
 
   @Post(':id/rooms')

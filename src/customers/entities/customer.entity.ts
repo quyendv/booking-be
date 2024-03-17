@@ -1,8 +1,10 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { AddressEntity } from '~/address/entities/address.entity';
 import { TimestampEntity } from '~/base/a.base.entity';
 import { GenderTypes } from '../constants/customer.constant';
+import { BookingEntity } from '~/bookings/entities/booking.entity';
+import { ReviewEntity } from '~/reviews/entities/review.entity';
 
 @Entity('customers')
 export class CustomerEntity extends TimestampEntity {
@@ -31,8 +33,14 @@ export class CustomerEntity extends TimestampEntity {
   @JoinColumn({ name: 'address_id' })
   address: AddressEntity;
 
+  @OneToMany(() => BookingEntity, (booking) => booking.customer)
+  bookings: BookingEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.customer)
+  reviews: ReviewEntity[];
+
   // Foreign Keys
   @Exclude({ toPlainOnly: true })
-  @Column('int', { nullable: true })
-  address_id: number;
+  @Column('int', { name: 'address_id', nullable: true })
+  addressId: number;
 }

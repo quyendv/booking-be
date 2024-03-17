@@ -27,6 +27,11 @@ export interface IEnvironmentConfig {
     googleOauthClientSecret: string;
     googleMailerRefreshToken: string;
   };
+  payment: {
+    vnp_TmnCode: string;
+    vnp_HashSecret: string;
+    // stripe, momo, zalo, ...
+  };
 }
 
 export const envValidation = Joi.object({
@@ -44,6 +49,8 @@ export const envValidation = Joi.object({
   GOOGLE_OAUTH_CLIENT_ID: Joi.required(),
   GOOGLE_OAUTH_CLIENT_SECRET: Joi.required(),
   GOOGLE_MAILER_REFRESH_TOKEN: Joi.required(),
+  VNP_TMN_CODE: Joi.required(),
+  VNP_HASH_SECRET: Joi.required(),
 });
 
 export default registerAs<IEnvironmentConfig>('environment', () => ({
@@ -73,5 +80,9 @@ export default registerAs<IEnvironmentConfig>('environment', () => ({
     googleOauthClientID: <string>process.env.GOOGLE_OAUTH_CLIENT_ID,
     googleOauthClientSecret: <string>process.env.GOOGLE_OAUTH_CLIENT_SECRET,
     googleMailerRefreshToken: <string>process.env.GOOGLE_MAILER_REFRESH_TOKEN,
+  },
+  payment: {
+    vnp_TmnCode: <string>process.env.VNP_TMN_CODE,
+    vnp_HashSecret: <string>process.env.VNP_HASH_SECRET,
   },
 }));

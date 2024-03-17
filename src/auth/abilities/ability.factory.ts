@@ -9,10 +9,13 @@ import { UserService } from '~/users/user.service';
 import {
   aliasPermissionActions,
   AppAbility,
+  FlatReviewBookingCustomer,
   PermissionActions,
   PermissionSubjects,
 } from '../types/role.type';
 import { RoomEntity } from '~/hotels/entities/room.entity';
+import { BookingEntity } from '~/bookings/entities/booking.entity';
+import { ReviewEntity } from '~/reviews/entities/review.entity';
 
 @Injectable()
 export class AbilityFactory {
@@ -37,13 +40,25 @@ export class AbilityFactory {
       can(PermissionActions.MANAGE, RoomEntity, {
         id: { $in: hotel.rooms.map((room) => room.id) },
       });
+      can(PermissionActions.READ, BookingEntity, { hotelId: hotel.id });
     }
 
     if (role === RoleTypes.CUSTOMER) {
       can(PermissionActions.UPDATE, CustomerEntity, { id: user.id });
+      if (user.isVerified) {
+        can(PermissionActions.CREATE, BookingEntity);
+        can([PermissionActions.READ, PermissionActions.UPDATE], BookingEntity, {
+          customerEmail: user.id,
+        });
+        can<FlatReviewBookingCustomer>(PermissionActions.CREATE, ReviewEntity, {
+          'booking.customerEmail': user.id,
+        });
+        can(PermissionActions.UPDATE, ReviewEntity, { customerEmail: user.id });
+      }
     }
     can(PermissionActions.READ, HotelEntity);
     can(PermissionActions.READ, RoomEntity);
+    can(PermissionActions.READ, ReviewEntity);
 
     return build({
       detectSubjectType: (item) => item.constructor as ExtractSubjectType<PermissionSubjects>,

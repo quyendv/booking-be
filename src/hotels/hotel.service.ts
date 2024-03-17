@@ -6,7 +6,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
 import { StorageService } from '~/storage/storage.service';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
@@ -37,14 +37,25 @@ export class HotelService extends BaseService<HotelEntity> {
     return this.createOne(data);
   }
 
-  async getHotelById(id: number): Promise<HotelEntity> {
-    const hotel = await this.findById(id, { relations: { rooms: true } });
+  async getHotelById(
+    id: number,
+    relations?: FindOptionsRelations<HotelEntity>,
+  ): Promise<HotelEntity> {
+    const hotel = await this.findById(id, {
+      relations: { ...(relations && relations), rooms: true },
+    });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }
 
-  async getHotelByEmail(email: string): Promise<HotelEntity> {
-    const hotel = await this.findOne({ where: { email }, relations: { rooms: true } });
+  async getHotelByEmail(
+    email: string,
+    relations?: FindOptionsRelations<HotelEntity>,
+  ): Promise<HotelEntity> {
+    const hotel = await this.findOne({
+      where: { email },
+      relations: { ...(relations && relations), rooms: true },
+    });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }

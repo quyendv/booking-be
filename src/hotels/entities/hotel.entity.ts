@@ -3,6 +3,8 @@ import { AddressEntity } from '~/address/entities/address.entity';
 import { SequenceBaseEntity } from '~/base/a.base.entity';
 import { GalleryItem } from '../types/gallery.type';
 import { RoomEntity } from './room.entity';
+import { BookingEntity } from '~/bookings/entities/booking.entity';
+import { ReviewEntity } from '~/reviews/entities/review.entity';
 
 @Entity('hotels')
 export class HotelEntity extends SequenceBaseEntity {
@@ -63,4 +65,10 @@ export class HotelEntity extends SequenceBaseEntity {
 
   @Column('bool', { name: 'swimming_pool', default: false })
   swimmingPool: boolean;
+
+  @OneToMany(() => BookingEntity, (booking) => booking.hotel)
+  bookings: BookingEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.hotel)
+  reviews: ReviewEntity[];
 }
