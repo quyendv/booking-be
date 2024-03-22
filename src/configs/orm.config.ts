@@ -15,6 +15,8 @@ export const dataSourceOptions: DataSourceOptions = {
   database: configService.get<string>('DB_NAME'),
   entities: ['dist/**/entities/*.entity.js'],
   migrations: ['dist/src/database/migrations/*.js', 'dist/src/database/seeds/*.js'],
+  // entities: ['src/**/entities/*.entity.ts'],
+  // migrations: ['src/database/migrations/*.ts', 'src/database/seeds/*.ts'],
 };
 
 export default new DataSource(dataSourceOptions);

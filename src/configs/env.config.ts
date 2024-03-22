@@ -69,10 +69,12 @@ export default registerAs<IEnvironmentConfig>('environment', () => ({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: ['dist/**/entities/*.entity.js'],
+    // entities: ['src/**/entities/*.entity.ts'],
     // autoLoadEntities: true,
     synchronize: false,
     logging: false,
     migrations: ['dist/src/database/migrations/*.js', 'dist/src/database/seeds/*.js'],
+    // migrations: ['src/database/migrations/*.ts', 'src/database/seeds/*.ts'],
     migrationsTableName: 'migrations',
   },
   mailer: {
