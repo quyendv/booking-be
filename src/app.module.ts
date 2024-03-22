@@ -13,9 +13,10 @@ import { CustomerModule } from './customers/customer.module';
 import { DatabaseModule } from './database/database.module';
 import { HotelModule } from './hotels/hotel.module';
 import { MailerModule } from './mailer/mailer.module';
+import { ReceptionistModule } from './receptionists/receptionist.module';
+import { ReviewModule } from './reviews/review.module';
 import { StorageModule } from './storage/storage.module';
 import { UserModule } from './users/user.module';
-import { ReviewModule } from './reviews/review.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ReviewModule } from './reviews/review.module';
     HotelModule,
     BookingModule,
     ReviewModule,
+    ReceptionistModule,
   ],
   controllers: [AppController],
   providers: [
