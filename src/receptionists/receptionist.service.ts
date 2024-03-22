@@ -8,12 +8,15 @@ import { ReceptionistEntity } from './entities/receptionist.entity';
 import { CommonUtils } from '~/base/utils/common.utils';
 import { RoleTypes } from '~/users/constants/user.constant';
 import { UpdateReceptionistDto } from './dto/update-receptionist.dto';
+import { AddressService } from '~/address/address.service';
+import { BaseResponse } from '~/base/types/response.type';
 
 @Injectable()
 export class ReceptionistService extends BaseService<ReceptionistEntity> {
   constructor(
     @InjectRepository(ReceptionistEntity) repository: Repository<ReceptionistEntity>,
     private readonly userService: UserService,
+    private readonly addressService: AddressService,
   ) {
     super(repository);
   }
@@ -28,14 +31,12 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
   }
 
   async createReceptionist(dto: CreateReceptionistDto): Promise<ReceptionistEntity> {
-    const { email, ...otherData } = dto;
-
-    await this.userService.createUser(email, RoleTypes.RECEPTIONIST, true);
-    await this.userService.createFirebaseUser(email);
+    await this.userService.createUser(dto.email, RoleTypes.RECEPTIONIST, true);
+    await this.userService.createFirebaseUser(dto.email);
     return this.createOne({
-      ...otherData,
-      id: email,
-      name: dto.name ?? CommonUtils.getEmailName(email),
+      ...dto,
+      id: dto.email,
+      name: dto.name ?? CommonUtils.getEmailName(dto.email),
     });
   }
 
@@ -54,13 +55,19 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
     });
   }
 
-  async deleteReceptionist(email: string): Promise<void> {
+  async deleteReceptionist(email: string): Promise<BaseResponse> {
     const receptionist = await this.findOne({ where: { id: email } });
     if (!receptionist) throw new NotFoundException('Receptionist not found to delete.');
 
     await this.userService.permanentDelete(email);
-    // await this.userService.deleteFirebaseUser(email);
-    // TODO: delete storage avatar
+    await this.userService.deleteFirebaseUser(email);
+    // TODO: delete storage file
+
     await this.permanentDelete(email);
+    if (receptionist.addressId) {
+      await this.addressService.permanentDelete(receptionist.addressId);
+    }
+
+    return { status: 'success', message: 'Receptionist deleted successfully' };
   }
 }

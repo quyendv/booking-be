@@ -35,7 +35,7 @@ export class ReceptionistEntity extends TimestampEntity {
   @JoinColumn({ name: 'hotel_id' })
   hotel: HotelEntity;
 
-  @OneToOne(() => AddressEntity, { nullable: true, cascade: true })
+  @OneToOne(() => AddressEntity, { cascade: true, nullable: false })
   @JoinColumn({ name: 'address_id' })
   address: AddressEntity;
 

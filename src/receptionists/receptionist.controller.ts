@@ -12,7 +12,7 @@ import { ListReceptionistQueryDto } from './dto/list-receptionist.dto';
 import { UpdateReceptionistDto } from './dto/update-receptionist.dto';
 import { ReceptionistEntity } from './entities/receptionist.entity';
 import { ReceptionistService } from './receptionist.service';
-import { DeleteResult } from 'typeorm';
+import { BaseResponse } from '~/base/types/response.type';
 
 @ApiTags('receptionists')
 @Controller('receptionists')
@@ -57,7 +57,7 @@ export class ReceptionistController {
   async deleteReceptionist(
     @Query('email') email: string,
     @AuthUser() user: UserPayload,
-  ): Promise<DeleteResult> {
+  ): Promise<BaseResponse> {
     const ability = await this.abilityService.getAbilityByEmail(user.email);
     ForbiddenError.from(ability)
       .setMessage('Admin or Owner Hotel can delete receptionist.')
@@ -65,7 +65,7 @@ export class ReceptionistController {
         PermissionActions.DELETE,
         this.receptionistService.createInstance({ id: email }),
       );
-    return this.receptionistService.permanentDelete(email);
+    return this.receptionistService.deleteReceptionist(email);
   }
 
   @Get()
