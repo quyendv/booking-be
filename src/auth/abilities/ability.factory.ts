@@ -16,12 +16,15 @@ import {
 import { RoomEntity } from '~/hotels/entities/room.entity';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
 import { ReviewEntity } from '~/reviews/entities/review.entity';
+import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
+import { ReceptionistService } from '~/receptionists/receptionist.service';
 
 @Injectable()
 export class AbilityFactory {
   constructor(
     private readonly userService: UserService,
     private readonly hotelService: HotelService,
+    private readonly receptionistService: ReceptionistService,
   ) {}
 
   async defineAbility(user: UserEntity): Promise<AppAbility> {
@@ -33,14 +36,27 @@ export class AbilityFactory {
     }
 
     if (role === RoleTypes.HOTEL) {
-      const hotel = await this.hotelService.getHotelByEmail(user.id);
+      const hotel = await this.hotelService.getHotelByEmail(user.id, {
+        rooms: true,
+        receptionists: true,
+      });
       can(PermissionActions.UPDATE, HotelEntity, { email: user.id });
       can(PermissionActions.UPDATE, HotelEntity, { id: hotel.id });
       can(PermissionActions.MANAGE, RoomEntity, { hotelId: hotel.id });
       can(PermissionActions.MANAGE, RoomEntity, {
         id: { $in: hotel.rooms.map((room) => room.id) },
       });
+      can(PermissionActions.MANAGE, ReceptionistEntity, { hotelId: hotel.id });
+      can(PermissionActions.MANAGE, ReceptionistEntity, {
+        id: { $in: hotel.receptionists.map((receptionist) => receptionist.id) },
+      });
       can(PermissionActions.READ, BookingEntity, { hotelId: hotel.id });
+    }
+
+    if (role === RoleTypes.RECEPTIONIST) {
+      const receptionist = await this.receptionistService.getReceptionistById(user.id);
+      can(PermissionActions.UPDATE, ReceptionistEntity, { id: user.id });
+      can(PermissionActions.READ, BookingEntity, ['status'], { hotelId: receptionist.hotelId });
     }
 
     if (role === RoleTypes.CUSTOMER) {

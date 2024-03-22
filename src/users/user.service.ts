@@ -7,28 +7,25 @@ import {
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as admin from 'firebase-admin';
 import { FindOptionsWhere, Repository } from 'typeorm';
+import { UserPayload } from '~/auth/types/request.type';
 import { BaseService } from '~/base/a.base.service';
+import { CommonUtils } from '~/base/utils/common.utils';
 import { CustomerService } from '~/customers/customer.service';
 import { CreateCustomerDto } from '~/customers/dto/create-customer.dto';
-import { MailerService } from '~/mailer/mailer.service';
+import { HotelService } from '~/hotels/hotel.service';
 import { RoleTypes } from './constants/user.constant';
 import { UserEntity } from './entities/user.entity';
 import { RoleService } from './sub-services/role.service';
-import { StorageFileInfo } from '~/storage/types/storage.type';
-import * as admin from 'firebase-admin';
-import { ConfigService } from '@nestjs/config';
 import { CurrentAccountInfo } from './types/user.type';
-import { UserPayload } from '~/auth/types/request.type';
-import { CommonUtils } from '~/base/utils/common.utils';
-import { HotelService } from '~/hotels/hotel.service';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
   constructor(
     @InjectRepository(UserEntity) repository: Repository<UserEntity>,
-    private readonly mailerService: MailerService,
     private readonly roleService: RoleService,
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
@@ -43,16 +40,6 @@ export class UserService extends BaseService<UserEntity> {
     return this.findOne({ where: condition }); // role is eager (always populate)
   }
 
-  async sendVerificationEmail(email: string, verifyLink: string): Promise<void> {
-    Logger.log(`Sending verification email to "${email}"`, 'Start');
-    await this.mailerService.sendEmail({
-      content: `<div>Please verify your email address by clicking on the <a href='${verifyLink}'>link</a>.</div>`,
-      to: email,
-      subject: '[Booking App] Verify Your Email Address',
-    });
-    Logger.log(`Verification email sent to "${email}"`, 'Done');
-  }
-
   async createUser(email: string, roleName: RoleTypes, isVerified = false): Promise<UserEntity> {
     const existingUser = await this.getUserByEmail(email);
     if (existingUser) {
@@ -60,28 +47,6 @@ export class UserService extends BaseService<UserEntity> {
     }
     const role = await this.roleService.getRoleByName(roleName);
     return this.createOne({ id: email, isVerified, role });
-  }
-
-  async createUnverifiedCustomer(
-    dto: CreateCustomerDto,
-    avatarInfo?: StorageFileInfo,
-  ): Promise<UserEntity> {
-    const user = await this.createUser(dto.email, RoleTypes.CUSTOMER, false);
-    await this.customerService.createCustomer(dto, avatarInfo);
-    return user;
-  }
-
-  async verifyCustomer(email: string): Promise<UserEntity> {
-    const user = await this.getUserByEmail(email);
-    if (!user) {
-      throw new InternalServerErrorException(
-        `Unverified user "${email}" was not created before verifying`,
-      );
-    }
-    if (user.isVerified) {
-      throw new BadRequestException(`User "${email}" has already been verified`);
-    }
-    return this.updateOne(user.id, { isVerified: true });
   }
 
   async createFirebaseUser(email: string, password?: string): Promise<void> {
@@ -98,6 +63,40 @@ export class UserService extends BaseService<UserEntity> {
         Logger.warn('Email already exists in Firebase.', 'UserService.createFirebaseUser');
       } else throw error;
     }
+  }
+
+  async deleteFirebaseUser(email: string): Promise<void> {
+    try {
+      const { uid } = await admin.auth().getUserByEmail(email);
+      await admin.auth().deleteUser(uid);
+    } catch (error) {
+      if (error.errorInfo?.code === 'auth/user-not-found') {
+        // throw new NotFoundException('User not found.');
+        Logger.warn('User not found in Firebase.', 'UserService.deleteFirebaseUser');
+      } else throw error;
+    }
+  }
+
+  /**
+   * Sign Up Customer
+   */
+  async createUnverifiedCustomer(dto: CreateCustomerDto): Promise<UserEntity> {
+    const user = await this.createUser(dto.email, RoleTypes.CUSTOMER, false);
+    await this.customerService.createCustomer(dto);
+    return user;
+  }
+
+  async verifyCustomer(email: string): Promise<UserEntity> {
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      throw new InternalServerErrorException(
+        `Unverified user "${email}" was not created before verifying`,
+      );
+    }
+    if (user.isVerified) {
+      throw new BadRequestException(`User "${email}" has already been verified`);
+    }
+    return this.updateOne(user.id, { isVerified: true });
   }
 
   async getCurrentInfo(payload: UserPayload): Promise<CurrentAccountInfo> {

@@ -50,7 +50,7 @@ export class HotelController {
   @Get('me')
   @Roles([PermissionActions.READ, HotelEntity])
   getCurrentHotel(@AuthUser() user: UserPayload): Promise<HotelEntity> {
-    return this.hotelService.getHotelByEmail(user.email);
+    return this.hotelService.getHotelByEmail(user.email, { rooms: true });
   }
 
   @Patch(':id')
@@ -70,7 +70,7 @@ export class HotelController {
   @Get(':id')
   @Roles([PermissionActions.GET, HotelEntity])
   getHotel(@Param('id') id: string): Promise<HotelEntity> {
-    return this.hotelService.getHotelById(+id, { bookings: true });
+    return this.hotelService.getHotelById(+id, { rooms: true, bookings: true });
   }
 
   @Get()

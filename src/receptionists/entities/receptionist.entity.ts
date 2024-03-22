@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { AddressEntity } from '~/address/entities/address.entity';
 import { TimestampEntity } from '~/base/a.base.entity';
 import { GenderTypes } from '~/customers/constants/customer.constant';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
@@ -27,18 +28,21 @@ export class ReceptionistEntity extends TimestampEntity {
   @Column('varchar', { nullable: true })
   gender: GenderTypes;
 
-  @ManyToOne(() => HotelEntity, (hotel) => hotel.receptionists, { onDelete: 'CASCADE' })
+  @ManyToOne(() => HotelEntity, (hotel) => hotel.receptionists, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'hotel_id' })
   hotel: HotelEntity;
 
-  // @OneToOne(() => AddressEntity, { nullable: true, cascade: true })
-  // @JoinColumn({ name: 'address_id' })
-  // address: AddressEntity;
+  @OneToOne(() => AddressEntity, { nullable: true, cascade: true })
+  @JoinColumn({ name: 'address_id' })
+  address: AddressEntity;
 
   // Foreign Keys
-  // @Exclude({ toPlainOnly: true })
-  // @Column('int', { name: 'address_id', nullable: true })
-  // addressId: number;
+  @Exclude({ toPlainOnly: true })
+  @Column('int', { name: 'address_id', nullable: true })
+  addressId: number;
 
   @Exclude({ toPlainOnly: true })
   @Column('int', { name: 'hotel_id' })

@@ -41,9 +41,7 @@ export class HotelService extends BaseService<HotelEntity> {
     id: number,
     relations?: FindOptionsRelations<HotelEntity>,
   ): Promise<HotelEntity> {
-    const hotel = await this.findById(id, {
-      relations: { ...(relations && relations), rooms: true },
-    });
+    const hotel = await this.findById(id, { relations: relations });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }
@@ -52,10 +50,7 @@ export class HotelService extends BaseService<HotelEntity> {
     email: string,
     relations?: FindOptionsRelations<HotelEntity>,
   ): Promise<HotelEntity> {
-    const hotel = await this.findOne({
-      where: { email },
-      relations: { ...(relations && relations), rooms: true },
-    });
+    const hotel = await this.findOne({ where: { email }, relations: relations });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }

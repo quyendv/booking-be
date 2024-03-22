@@ -37,7 +37,7 @@ export class MailerService {
     });
   }
 
-  private async sendResendEmail(data: SendEmailType): Promise<string> {
+  async sendResendEmail(data: SendEmailType): Promise<string> {
     const transporter = this.getResendTransport();
     const info = await transporter.sendMail({
       from: 'onboarding@resend.dev', // replace with custom domain

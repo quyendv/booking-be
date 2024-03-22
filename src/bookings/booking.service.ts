@@ -98,7 +98,7 @@ export class BookingService extends BaseService<BookingEntity> {
       throw new BadRequestException('Booking already exists for the given date range');
     }
 
-    const hotel = await this.hotelService.getHotelById(dto.hotelId);
+    const hotel = await this.hotelService.getHotelById(dto.hotelId, { rooms: true });
     const room = hotel.rooms.find((r) => r.id === dto.roomId);
     if (!room) {
       throw new NotFoundException(`Room ${dto.roomId} not found`);
