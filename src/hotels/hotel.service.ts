@@ -49,7 +49,7 @@ export class HotelService extends BaseService<HotelEntity> {
     throw new ForbiddenException('You are not allowed to access this resource');
   }
 
-  private async getReceptionistHotel(
+  async getReceptionistHotel(
     receptionistEmail: string,
     relations?: FindOptionsRelations<HotelEntity>,
   ): Promise<HotelEntity> {

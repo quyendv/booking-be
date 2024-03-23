@@ -50,13 +50,15 @@ export class AbilityFactory {
       can(PermissionActions.MANAGE, ReceptionistEntity, {
         id: { $in: hotel.receptionists.map((receptionist) => receptionist.id) },
       });
-      can(PermissionActions.READ, BookingEntity, { hotelId: hotel.id });
+      can([PermissionActions.READ, PermissionActions.UPDATE], BookingEntity, { hotelId: hotel.id });
     }
 
     if (role === RoleTypes.RECEPTIONIST) {
       const receptionist = await this.receptionistService.getReceptionistById(user.id);
       can(PermissionActions.UPDATE, ReceptionistEntity, { id: user.id });
-      can(PermissionActions.READ, BookingEntity, ['status'], { hotelId: receptionist.hotelId });
+      can([PermissionActions.READ, PermissionActions.UPDATE], BookingEntity /* , ['status'] */, {
+        hotelId: receptionist.hotelId,
+      });
     }
 
     if (role === RoleTypes.CUSTOMER) {

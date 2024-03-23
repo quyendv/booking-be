@@ -2,6 +2,7 @@ import { ForbiddenError } from '@casl/ability';
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -10,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { AppAbility, PermissionActions } from '~/auth/types/role.type';
 import { BaseService } from '~/base/a.base.service';
+import { BaseResponse } from '~/base/types/response.type';
 import { CommonUtils } from '~/base/utils/common.utils';
 import { CustomerService } from '~/customers/customer.service';
 import { HotelService } from '~/hotels/hotel.service';
@@ -19,7 +21,6 @@ import { BookingStatus, PaymentChannel } from './constants/booking.constant';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { BookingEntity } from './entities/booking.entity';
-import { BaseResponse } from '~/base/types/response.type';
 
 @Injectable()
 export class BookingService extends BaseService<BookingEntity> {
@@ -59,6 +60,7 @@ export class BookingService extends BaseService<BookingEntity> {
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
+    console.log({ booking, ability });
     ForbiddenError.from(ability)
       .setMessage('Admin or Owner Hotel/Customer can update booking.')
       .throwUnlessCan(PermissionActions.UPDATE, booking);
@@ -127,18 +129,25 @@ export class BookingService extends BaseService<BookingEntity> {
   }
 
   async listMyBookings(user: UserEntity): Promise<BookingEntity[]> {
-    if (user.roleName === RoleTypes.CUSTOMER) {
-      return this.findAll({
-        where: { customerEmail: user.id },
-        relations: { room: true, hotel: true, review: true },
-      });
-    } else if (user.roleName === RoleTypes.HOTEL) {
-      return this.findAll({
-        where: { hotelOwnerEmail: user.id },
-        relations: { room: true, hotel: true, review: true },
-      });
-    } else {
-      throw new BadRequestException('Invalid user role');
+    switch (user.roleName) {
+      case RoleTypes.CUSTOMER:
+        return this.findAll({
+          where: { customerEmail: user.id },
+          relations: { room: true, hotel: true, review: true },
+        });
+      case RoleTypes.HOTEL:
+        return this.findAll({
+          where: { hotelOwnerEmail: user.id },
+          relations: { room: true, hotel: true, review: true },
+        });
+      case RoleTypes.RECEPTIONIST:
+        const hotel = await this.hotelService.getReceptionistHotel(user.id);
+        return this.findAll({
+          where: { hotelId: hotel.id },
+          relations: { room: true, hotel: true, review: true },
+        });
+      default:
+        throw new ForbiddenException('Invalid user role');
     }
   }
 }
