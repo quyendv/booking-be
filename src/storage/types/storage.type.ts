@@ -3,8 +3,8 @@ export type StorageUploadResult = {
   url: string;
 };
 
-export type StorageFileInfo = {
-  file: Express.Multer.File | undefined;
-  folder: string;
-  prefix?: string;
-};
+// export type StorageFileInfo = {
+//   file: Express.Multer.File | undefined;
+//   folder: string;
+//   prefix?: string;
+// };

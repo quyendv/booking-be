@@ -18,13 +18,17 @@ import { RolesGuard } from './guards/role.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from './decorators/role.decorator';
 import { PermissionActions } from './types/role.type';
+import { UserService } from '~/users/user.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard, RolesGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post('sign-in')
   signIn(@AuthUser() user: UserPayload): Promise<UserEntity> {
@@ -45,6 +49,6 @@ export class AuthController {
   @Post('firebase')
   @Roles([PermissionActions.CREATE, 'firebase-account'])
   createFirebaseAccount(@Body() body: { email: string }): Promise<void> {
-    return this.authService.createFirebaseAccount(body.email);
+    return this.userService.createFirebaseUser(body.email);
   }
 }
