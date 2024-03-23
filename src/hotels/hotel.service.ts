@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -8,17 +9,18 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
+import { BaseResponse } from '~/base/types/response.type';
 import { StorageService } from '~/storage/storage.service';
-import { UpdateHotelDto } from './dto/update-hotel.dto';
-import { HotelEntity } from './entities/hotel.entity';
-import { RoomService } from './sub-services/room.service';
-import { RoomEntity } from './entities/room.entity';
-import { CreateRoomDto } from './dto/create-room.dto';
-import { UpdateRoomDto } from './dto/update-room.dto';
+import { RoleTypes } from '~/users/constants/user.constant';
+import { UserEntity } from '~/users/entities/user.entity';
 import { UserService } from '~/users/user.service';
 import { CreateHotelDto } from './dto/create-hotel.dto';
-import { RoleTypes } from '~/users/constants/user.constant';
-import { BaseResponse } from '~/base/types/response.type';
+import { CreateRoomDto } from './dto/create-room.dto';
+import { UpdateHotelDto } from './dto/update-hotel.dto';
+import { UpdateRoomDto } from './dto/update-room.dto';
+import { HotelEntity } from './entities/hotel.entity';
+import { RoomEntity } from './entities/room.entity';
+import { RoomService } from './sub-services/room.service';
 
 @Injectable()
 export class HotelService extends BaseService<HotelEntity> {
@@ -35,6 +37,28 @@ export class HotelService extends BaseService<HotelEntity> {
     await this.userService.createFirebaseUser(data.email);
     await this.userService.createUser(data.email, RoleTypes.HOTEL, true);
     return this.createOne(data);
+  }
+
+  async getMyHotel(user: UserEntity): Promise<HotelEntity> {
+    if (user.roleName === RoleTypes.HOTEL) {
+      return this.getHotelByEmail(user.id, { rooms: true });
+    }
+    if (user.roleName === RoleTypes.RECEPTIONIST) {
+      return this.getReceptionistHotel(user.id, { rooms: true });
+    }
+    throw new ForbiddenException('You are not allowed to access this resource');
+  }
+
+  private async getReceptionistHotel(
+    receptionistEmail: string,
+    relations?: FindOptionsRelations<HotelEntity>,
+  ): Promise<HotelEntity> {
+    const hotel = await this.findOne({
+      where: { receptionists: { id: receptionistEmail } },
+      relations: relations,
+    });
+    if (!hotel) throw new NotFoundException('Hotel not found');
+    return hotel;
   }
 
   async getHotelById(

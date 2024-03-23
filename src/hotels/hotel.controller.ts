@@ -15,12 +15,13 @@ import { ApiTags } from '@nestjs/swagger';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
 import { Public } from '~/auth/decorators/public.decorator';
 import { Roles } from '~/auth/decorators/role.decorator';
-import { AuthUser } from '~/auth/decorators/user.decorator';
+import { AuthUser, GetUser } from '~/auth/decorators/user.decorator';
 import { AuthGuard } from '~/auth/guards/auth.guard';
 import { RolesGuard } from '~/auth/guards/role.guard';
 import { UserPayload } from '~/auth/types/request.type';
 import { PermissionActions } from '~/auth/types/role.type';
 import { BaseResponse } from '~/base/types/response.type';
+import { UserEntity } from '~/users/entities/user.entity';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
@@ -49,8 +50,8 @@ export class HotelController {
 
   @Get('me')
   @Roles([PermissionActions.READ, HotelEntity])
-  getCurrentHotel(@AuthUser() user: UserPayload): Promise<HotelEntity> {
-    return this.hotelService.getHotelByEmail(user.email, { rooms: true });
+  getCurrentHotel(@GetUser() user: UserEntity): Promise<HotelEntity> {
+    return this.hotelService.getMyHotel(user);
   }
 
   @Patch(':id')
