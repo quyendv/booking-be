@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
@@ -15,7 +15,7 @@ import { BaseResponse } from '~/base/types/response.type';
 export class ReceptionistService extends BaseService<ReceptionistEntity> {
   constructor(
     @InjectRepository(ReceptionistEntity) repository: Repository<ReceptionistEntity>,
-    private readonly userService: UserService,
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
     private readonly addressService: AddressService,
   ) {
     super(repository);

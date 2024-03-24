@@ -21,6 +21,7 @@ import { RoleTypes } from './constants/user.constant';
 import { UserEntity } from './entities/user.entity';
 import { RoleService } from './sub-services/role.service';
 import { CurrentAccountInfo } from './types/user.type';
+import { ReceptionistService } from '~/receptionists/receptionist.service';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -29,7 +30,9 @@ export class UserService extends BaseService<UserEntity> {
     private readonly roleService: RoleService,
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
-    @Inject(forwardRef(() => CustomerService)) private readonly hotelService: HotelService,
+    @Inject(forwardRef(() => HotelService)) private readonly hotelService: HotelService,
+    @Inject(forwardRef(() => ReceptionistService))
+    private readonly receptionistService: ReceptionistService,
   ) {
     super(repository);
   }
@@ -99,14 +102,15 @@ export class UserService extends BaseService<UserEntity> {
     return this.updateOne(user.id, { isVerified: true });
   }
 
-  async getCurrentInfo(payload: UserPayload): Promise<CurrentAccountInfo> {
-    const user = await this.getUserByEmail(payload.email);
+  async getCurrentInfo(payload: UserPayload, isVerified?: boolean): Promise<CurrentAccountInfo> {
+    const user = await this.getUserByEmail(payload.email, isVerified);
     if (!user) throw new NotFoundException(`User ${payload.email} not found`);
+
     if (user.roleName === RoleTypes.ADMIN) {
       return {
         id: user.id,
         email: user.id,
-        isVerify: user.isVerified,
+        isVerified: user.isVerified,
         role: user.roleName,
         avatar: payload.picture,
         name: payload.name ?? CommonUtils.getEmailName(payload.email),
@@ -119,7 +123,7 @@ export class UserService extends BaseService<UserEntity> {
         email: user.id,
         name: customer.name,
         role: user.roleName,
-        isVerify: user.isVerified,
+        isVerified: user.isVerified,
         avatar: customer.avatar ?? undefined,
       };
     }
@@ -130,8 +134,19 @@ export class UserService extends BaseService<UserEntity> {
         email: user.id,
         name: hotel.name,
         role: user.roleName,
-        isVerify: user.isVerified,
+        isVerified: user.isVerified,
         avatar: hotel.imageUrl ?? undefined,
+      };
+    }
+    if (user.roleName === RoleTypes.RECEPTIONIST) {
+      const receptionist = await this.receptionistService.getReceptionistById(payload.email);
+      return {
+        id: receptionist.id,
+        email: user.id,
+        name: receptionist.name,
+        role: user.roleName,
+        isVerified: user.isVerified,
+        avatar: receptionist.avatar ?? undefined,
       };
     }
     throw new InternalServerErrorException(`Role "${user.roleName}" is not supported`);

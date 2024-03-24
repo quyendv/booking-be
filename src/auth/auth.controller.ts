@@ -6,19 +6,20 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { BaseResponse } from '~/base/types/response.type';
 import { UserEntity } from '~/users/entities/user.entity';
+import { CurrentAccountInfo } from '~/users/types/user.type';
+import { UserService } from '~/users/user.service';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { Roles } from './decorators/role.decorator';
 import { AuthUser } from './decorators/user.decorator';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { AuthGuard } from './guards/auth.guard';
-import { UserPayload } from './types/request.type';
 import { RolesGuard } from './guards/role.guard';
-import { ApiTags } from '@nestjs/swagger';
-import { Roles } from './decorators/role.decorator';
+import { UserPayload } from './types/request.type';
 import { PermissionActions } from './types/role.type';
-import { UserService } from '~/users/user.service';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -31,8 +32,9 @@ export class AuthController {
   ) {}
 
   @Post('sign-in')
-  signIn(@AuthUser() user: UserPayload): Promise<UserEntity> {
-    return this.authService.signIn(user);
+  signIn(@AuthUser() user: UserPayload): Promise<CurrentAccountInfo> {
+    // return this.authService.signIn(user);
+    return this.userService.getCurrentInfo(user);
   }
 
   @Post('sign-up')
