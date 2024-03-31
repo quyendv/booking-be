@@ -60,7 +60,7 @@ export class BookingService extends BaseService<BookingEntity> {
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
-    console.log({ booking, ability });
+
     ForbiddenError.from(ability)
       .setMessage('Admin or Owner Hotel/Customer can update booking.')
       .throwUnlessCan(PermissionActions.UPDATE, booking);
@@ -115,6 +115,7 @@ export class BookingService extends BaseService<BookingEntity> {
       hotelOwnerEmail: hotel.email,
       isPaid: false,
       paymentId,
+      timeRules: hotel.timeRules,
     });
 
     return booking;

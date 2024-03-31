@@ -8,6 +8,7 @@ import { RoomEntity } from '~/hotels/entities/room.entity';
 import { BookingStatus, PaymentChannel, PaymentCurrency } from '../constants/booking.constant';
 import { PaymentInfo } from '../payment.type';
 import { ReviewEntity } from '../../reviews/entities/review.entity';
+import { TimeRules } from '~/hotels/types/time-rules.type';
 
 @Entity('bookings')
 export class BookingEntity extends UuidBaseEntity {
@@ -34,6 +35,9 @@ export class BookingEntity extends UuidBaseEntity {
 
   @Column('date', { name: 'start_date' })
   startDate: string;
+
+  @Column('jsonb', { name: 'time_rules' })
+  timeRules: TimeRules;
 
   @Column('date', { name: 'end_date' })
   endDate: string;

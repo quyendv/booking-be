@@ -7,6 +7,7 @@ import { BookingEntity } from '~/bookings/entities/booking.entity';
 import { ReviewEntity } from '~/reviews/entities/review.entity';
 import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
 import { HotelManagerEntity } from './hotel-manager.entity';
+import { TimeRules } from '../types/time-rules.type';
 
 @Entity('hotels')
 export class HotelEntity extends SequenceBaseEntity {
@@ -71,6 +72,15 @@ export class HotelEntity extends SequenceBaseEntity {
 
   @Column('bool', { name: 'swimming_pool', default: false })
   swimmingPool: boolean;
+
+  @Column('bool', { name: 'allowPets', default: false })
+  allowPets: boolean;
+
+  @Column('bool', { name: 'allowSmoking', default: false })
+  allowSmoking: boolean;
+
+  @Column('jsonb', { name: 'time_rules' })
+  timeRules: TimeRules;
 
   @OneToMany(() => BookingEntity, (booking) => booking.hotel)
   bookings: BookingEntity[];
