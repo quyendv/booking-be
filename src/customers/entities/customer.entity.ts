@@ -5,6 +5,7 @@ import { TimestampEntity } from '~/base/a.base.entity';
 import { GenderTypes } from '../constants/customer.constant';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
 import { ReviewEntity } from '~/reviews/entities/review.entity';
+import { UserEntity } from '~/users/entities/user.entity';
 
 @Entity('customers')
 export class CustomerEntity extends TimestampEntity {
@@ -29,6 +30,10 @@ export class CustomerEntity extends TimestampEntity {
   @Column('varchar', { nullable: true })
   gender: GenderTypes;
 
+  @OneToOne(() => UserEntity, (user) => user.customer, { nullable: true })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
+
   @OneToOne(() => AddressEntity, { nullable: true, cascade: true })
   @JoinColumn({ name: 'address_id' })
   address: AddressEntity;
@@ -43,4 +48,8 @@ export class CustomerEntity extends TimestampEntity {
   @Exclude({ toPlainOnly: true })
   @Column('int', { name: 'address_id', nullable: true })
   addressId: number;
+
+  @Exclude({ toPlainOnly: true })
+  @Column('varchar', { name: 'user_id' })
+  userId: string;
 }

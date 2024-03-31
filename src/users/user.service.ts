@@ -10,19 +10,16 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as admin from 'firebase-admin';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { UserPayload } from '~/auth/types/request.type';
 import { BaseService } from '~/base/a.base.service';
 import { CommonUtils } from '~/base/utils/common.utils';
 import { CustomerService } from '~/customers/customer.service';
 import { CreateCustomerDto } from '~/customers/dto/create-customer.dto';
-import { HotelService } from '~/hotels/hotel.service';
 import { RoleTypes } from './constants/user.constant';
 import { UserEntity } from './entities/user.entity';
 import { RoleService } from './sub-services/role.service';
 import { CurrentAccountInfo } from './types/user.type';
-import { ReceptionistService } from '~/receptionists/receptionist.service';
-import { HotelManagerService } from '~/hotels/sub-services/hotel-manager.service';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -31,19 +28,18 @@ export class UserService extends BaseService<UserEntity> {
     private readonly roleService: RoleService,
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
-    @Inject(forwardRef(() => HotelService)) private readonly hotelService: HotelService,
-    @Inject(forwardRef(() => HotelManagerService))
-    private readonly hotelManagerService: HotelManagerService,
-    @Inject(forwardRef(() => ReceptionistService))
-    private readonly receptionistService: ReceptionistService,
   ) {
     super(repository);
   }
 
-  getUserByEmail(email: string, isVerified?: boolean): Promise<UserEntity | null> {
+  getUserByEmail(
+    email: string,
+    isVerified?: boolean,
+    relations?: FindOptionsRelations<UserEntity>,
+  ): Promise<UserEntity | null> {
     const condition: FindOptionsWhere<UserEntity> | FindOptionsWhere<UserEntity>[] = { id: email };
     if (isVerified !== undefined) condition.isVerified = isVerified;
-    return this.findOne({ where: condition }); // role is eager (always populate)
+    return this.findOne({ where: condition, relations }); // role is eager (always populate)
   }
 
   async createUser(email: string, roleName: RoleTypes, isVerified = false): Promise<UserEntity> {
@@ -106,7 +102,11 @@ export class UserService extends BaseService<UserEntity> {
   }
 
   async getCurrentInfo(payload: UserPayload, isVerified?: boolean): Promise<CurrentAccountInfo> {
-    const user = await this.getUserByEmail(payload.email, isVerified);
+    const user = await this.getUserByEmail(payload.email, isVerified, {
+      hotelManager: true,
+      customer: true,
+      receptionist: true,
+    });
     if (!user) throw new NotFoundException(`User ${payload.email} not found`);
 
     if (user.roleName === RoleTypes.ADMIN) {
@@ -120,38 +120,38 @@ export class UserService extends BaseService<UserEntity> {
       };
     }
     if (user.roleName === RoleTypes.CUSTOMER) {
-      const customer = await this.customerService.getCustomerByEmail(payload.email);
+      // const customer = await this.customerService.getCustomerByEmail(payload.email);
       return {
         // id: customer.id,
         email: user.id,
-        name: customer.name,
+        name: user.customer.name,
         role: user.roleName,
         isVerified: user.isVerified,
-        avatar: customer.avatar ?? undefined,
+        avatar: user.customer.avatar ?? undefined,
       };
     }
     if (user.roleName === RoleTypes.HOTEL_MANAGER) {
       // const hotel = await this.hotelService.getHotelByEmail(payload.email);
-      const hotelManager = await this.hotelManagerService.getHotelManagerByEmail(user.id);
+      // const hotelManager = await this.hotelManagerService.getHotelManagerByEmail(user.id);
 
       return {
         // id: hotel.id,
         email: user.id,
-        name: hotelManager.name,
+        name: user.hotelManager.name,
         role: user.roleName,
         isVerified: user.isVerified,
-        avatar: hotelManager.avatar ?? undefined,
+        avatar: user.hotelManager.avatar ?? undefined,
       };
     }
     if (user.roleName === RoleTypes.RECEPTIONIST) {
-      const receptionist = await this.receptionistService.getReceptionistById(payload.email);
+      // const receptionist = await this.receptionistService.getReceptionistById(payload.email);
       return {
         // id: receptionist.id,
         email: user.id,
-        name: receptionist.name,
+        name: user.receptionist.name,
         role: user.roleName,
         isVerified: user.isVerified,
-        avatar: receptionist.avatar ?? undefined,
+        avatar: user.receptionist.avatar ?? undefined,
       };
     }
     throw new InternalServerErrorException(`Role "${user.roleName}" is not supported`);
