@@ -6,11 +6,16 @@ import { RoomEntity } from './room.entity';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
 import { ReviewEntity } from '~/reviews/entities/review.entity';
 import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
+import { HotelManagerEntity } from './hotel-manager.entity';
 
 @Entity('hotels')
 export class HotelEntity extends SequenceBaseEntity {
-  @Column('varchar', { name: 'email', unique: true })
-  email: string;
+  @OneToOne(() => HotelManagerEntity, { cascade: true, nullable: false })
+  @JoinColumn({ name: 'manager_email' })
+  manager: HotelManagerEntity;
+
+  @Column('varchar', { name: 'manager_email', unique: true })
+  email: string; // manager email
 
   @Column('varchar', { name: 'name', length: 255 })
   name: string;

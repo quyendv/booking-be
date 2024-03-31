@@ -30,6 +30,9 @@ import { HotelEntity } from './entities/hotel.entity';
 import { RoomEntity } from './entities/room.entity';
 import { HotelService } from './hotel.service';
 import { RoomService } from './sub-services/room.service';
+import { HotelManagerEntity } from './entities/hotel-manager.entity';
+import { HotelManagerService } from './sub-services/hotel-manager.service';
+import { UpdateHotelManagerDto } from './dto/update-hotel-manager.dto';
 
 @ApiTags('Hotels')
 @Controller('hotels')
@@ -39,8 +42,25 @@ export class HotelController {
   constructor(
     private readonly hotelService: HotelService,
     private readonly roomService: RoomService,
+    private readonly hotelManagerService: HotelManagerService,
     private readonly abilityService: AbilityFactory,
   ) {}
+
+  @Patch('manager')
+  // @Roles([PermissionActions.UPDATE, HotelManagerEntity])
+  async updateHotelManager(
+    @AuthUser() user: UserPayload,
+    @Body() body: UpdateHotelManagerDto,
+  ): Promise<HotelManagerEntity> {
+    const ability = await this.abilityService.getAbilityByEmail(user.email);
+    ForbiddenError.from(ability)
+      .setMessage('Admin or Owner Hotel Manager can update info.')
+      .throwUnlessCan(
+        PermissionActions.UPDATE,
+        this.hotelManagerService.createInstance({ id: body.email }),
+      );
+    return this.hotelManagerService.updateHotelManager(body);
+  }
 
   @Post()
   @Roles([PermissionActions.CREATE, HotelEntity])

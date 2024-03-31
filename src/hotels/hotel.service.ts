@@ -21,6 +21,7 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { HotelEntity } from './entities/hotel.entity';
 import { RoomEntity } from './entities/room.entity';
 import { RoomService } from './sub-services/room.service';
+import { CommonUtils } from '~/base/utils/common.utils';
 
 @Injectable()
 export class HotelService extends BaseService<HotelEntity> {
@@ -36,7 +37,10 @@ export class HotelService extends BaseService<HotelEntity> {
   async createHotel(data: CreateHotelDto): Promise<HotelEntity> {
     await this.userService.createFirebaseUser(data.email);
     await this.userService.createUser(data.email, RoleTypes.HOTEL, true);
-    return this.createOne(data);
+    return this.createOne({
+      ...data,
+      manager: { id: data.email, name: CommonUtils.getEmailName(data.email) },
+    });
   }
 
   async getMyHotel(user: UserEntity): Promise<HotelEntity> {
