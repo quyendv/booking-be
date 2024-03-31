@@ -28,37 +28,37 @@ export class CreateReviewDto {
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  @Max(10) // TODO: multiple of 0.5
+  @Max(5) // TODO: multiple of 0.5
   staffRating: number;
 
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  @Max(10)
+  @Max(5)
   facilityRating: number;
 
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  @Max(10)
+  @Max(5)
   cleanlinessRating: number;
 
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  @Max(10)
+  @Max(5)
   comfortRating: number;
 
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  @Max(10)
+  @Max(5)
   valueForMoneyRating: number;
 
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
-  @Max(10)
+  @Max(5)
   locationRating: number;
 
   @IsNotEmpty()

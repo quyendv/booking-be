@@ -38,7 +38,7 @@ export class ReviewEntity extends UuidBaseEntity {
   // Rating info
   @Column('decimal', {
     name: 'staffRating',
-    precision: 3,
+    precision: 2,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -47,7 +47,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'facilityRating',
-    precision: 3,
+    precision: 2,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -56,7 +56,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'cleanlinessRating',
-    precision: 3,
+    precision: 2,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -65,7 +65,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'comfortRating',
-    precision: 3,
+    precision: 2,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -74,7 +74,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'valueForMoneyRating',
-    precision: 3,
+    precision: 2,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
@@ -83,7 +83,7 @@ export class ReviewEntity extends UuidBaseEntity {
 
   @Column('decimal', {
     name: 'locationRating',
-    precision: 3,
+    precision: 2,
     scale: 1,
     default: 0,
     transformer: new ColumnNumericTransformer(),
