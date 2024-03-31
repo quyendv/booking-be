@@ -1,47 +1,6 @@
-import { Type } from 'class-transformer';
-import {
-  IsEnum,
-  IsMobilePhone,
-  IsOptional,
-  IsString,
-  Matches,
-  ValidateNested,
-} from 'class-validator';
-import { AddressDto } from '~/address/dto/address.dto';
-import { Validator } from '~/base/constants/validator.constant';
-import { EmailDto } from '~/base/dto/base.dto';
-import { GenderTypes } from '../constants/customer.constant';
+import { ProfileDto } from '~/base/dto/base.dto';
 
-export class CreateCustomerDto extends EmailDto {
-  @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  avatar?: string;
-
-  @IsOptional()
-  @IsString()
-  avatarKey?: string;
-
-  @IsOptional()
-  @Matches(Validator.Date.REGEX, { message: Validator.Date.message('birthday') })
-  birthday?: string;
-
-  @IsOptional()
-  @IsMobilePhone()
-  phone?: string;
-
-  @IsOptional()
-  @IsEnum(GenderTypes)
-  gender?: GenderTypes;
-
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => AddressDto)
-  address?: AddressDto;
-} // json
+export class CreateCustomerDto extends ProfileDto {} // json
 
 // export class CreateCustomerFormDataDto extends OmitType(CreateCustomerDto, ['address'] as const) {
 //   @IsOptional()
