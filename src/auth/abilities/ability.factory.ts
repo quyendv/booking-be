@@ -18,6 +18,7 @@ import { BookingEntity } from '~/bookings/entities/booking.entity';
 import { ReviewEntity } from '~/reviews/entities/review.entity';
 import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
 import { ReceptionistService } from '~/receptionists/receptionist.service';
+import { HotelManagerEntity } from '~/hotels/entities/hotel-manager.entity';
 
 @Injectable()
 export class AbilityFactory {
@@ -40,6 +41,7 @@ export class AbilityFactory {
         rooms: true,
         receptionists: true,
       });
+      can([PermissionActions.READ, PermissionActions.UPDATE], HotelManagerEntity, { id: user.id });
       can(PermissionActions.UPDATE, HotelEntity, { email: user.id });
       can(PermissionActions.UPDATE, HotelEntity, { id: hotel.id });
       can(PermissionActions.MANAGE, RoomEntity, { hotelId: hotel.id });

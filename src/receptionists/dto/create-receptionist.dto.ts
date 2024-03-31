@@ -1,7 +1,7 @@
 import { IsInt, IsNotEmpty } from 'class-validator';
-import { CreateCustomerDto } from '~/customers/dto/create-customer.dto';
+import { ProfileDto } from '~/base/dto/base.dto';
 
-export class CreateReceptionistDto extends CreateCustomerDto {
+export class CreateReceptionistDto extends ProfileDto {
   @IsNotEmpty()
   @IsInt()
   hotelId: number;

@@ -5,6 +5,7 @@ import { CustomerEntity } from '~/customers/entities/customer.entity';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
 import { RoomEntity } from '~/hotels/entities/room.entity';
 import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
+import { HotelManagerEntity } from '~/hotels/entities/hotel-manager.entity';
 
 export enum PermissionActions {
   READ = 'read',
@@ -28,6 +29,7 @@ export type PermissionSubjects = InferSubjects<
   | typeof BookingEntity
   | typeof ReviewEntity
   | typeof ReceptionistEntity
+  | typeof HotelManagerEntity
   | 'firebase-account'
   | 'all'
 >;
