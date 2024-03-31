@@ -130,7 +130,7 @@ export class UserService extends BaseService<UserEntity> {
         avatar: customer.avatar ?? undefined,
       };
     }
-    if (user.roleName === RoleTypes.HOTEL) {
+    if (user.roleName === RoleTypes.HOTEL_MANAGER) {
       // const hotel = await this.hotelService.getHotelByEmail(payload.email);
       const hotelManager = await this.hotelManagerService.getHotelManagerByEmail(user.id);
 

@@ -135,7 +135,7 @@ export class BookingService extends BaseService<BookingEntity> {
           where: { customerEmail: user.id },
           relations: { room: true, hotel: true, review: true },
         });
-      case RoleTypes.HOTEL:
+      case RoleTypes.HOTEL_MANAGER:
         return this.findAll({
           where: { hotelOwnerEmail: user.id },
           relations: { room: true, hotel: true, review: true },
