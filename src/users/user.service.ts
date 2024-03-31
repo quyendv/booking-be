@@ -22,6 +22,7 @@ import { UserEntity } from './entities/user.entity';
 import { RoleService } from './sub-services/role.service';
 import { CurrentAccountInfo } from './types/user.type';
 import { ReceptionistService } from '~/receptionists/receptionist.service';
+import { HotelManagerService } from '~/hotels/sub-services/hotel-manager.service';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -31,6 +32,8 @@ export class UserService extends BaseService<UserEntity> {
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
     @Inject(forwardRef(() => HotelService)) private readonly hotelService: HotelService,
+    @Inject(forwardRef(() => HotelManagerService))
+    private readonly hotelManagerService: HotelManagerService,
     @Inject(forwardRef(() => ReceptionistService))
     private readonly receptionistService: ReceptionistService,
   ) {
@@ -108,7 +111,7 @@ export class UserService extends BaseService<UserEntity> {
 
     if (user.roleName === RoleTypes.ADMIN) {
       return {
-        id: user.id,
+        // id: user.id,
         email: user.id,
         isVerified: user.isVerified,
         role: user.roleName,
@@ -119,7 +122,7 @@ export class UserService extends BaseService<UserEntity> {
     if (user.roleName === RoleTypes.CUSTOMER) {
       const customer = await this.customerService.getCustomerByEmail(payload.email);
       return {
-        id: customer.id,
+        // id: customer.id,
         email: user.id,
         name: customer.name,
         role: user.roleName,
@@ -128,20 +131,22 @@ export class UserService extends BaseService<UserEntity> {
       };
     }
     if (user.roleName === RoleTypes.HOTEL) {
-      const hotel = await this.hotelService.getHotelByEmail(payload.email);
+      // const hotel = await this.hotelService.getHotelByEmail(payload.email);
+      const hotelManager = await this.hotelManagerService.getHotelManagerByEmail(user.id);
+
       return {
-        id: hotel.id,
+        // id: hotel.id,
         email: user.id,
-        name: hotel.name,
+        name: hotelManager.name,
         role: user.roleName,
         isVerified: user.isVerified,
-        avatar: hotel.imageUrl ?? undefined,
+        avatar: hotelManager.avatar ?? undefined,
       };
     }
     if (user.roleName === RoleTypes.RECEPTIONIST) {
       const receptionist = await this.receptionistService.getReceptionistById(payload.email);
       return {
-        id: receptionist.id,
+        // id: receptionist.id,
         email: user.id,
         name: receptionist.name,
         role: user.roleName,
