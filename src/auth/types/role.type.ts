@@ -6,6 +6,7 @@ import { HotelEntity } from '~/hotels/entities/hotel.entity';
 import { RoomEntity } from '~/hotels/entities/room.entity';
 import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
 import { HotelManagerEntity } from '~/hotels/entities/hotel-manager.entity';
+import { UserEntity } from '~/users/entities/user.entity';
 
 export enum PermissionActions {
   READ = 'read',
@@ -23,6 +24,7 @@ export enum PermissionActions {
 }
 
 export type PermissionSubjects = InferSubjects<
+  | typeof UserEntity
   | typeof CustomerEntity
   | typeof HotelEntity
   | typeof RoomEntity

@@ -35,16 +35,20 @@ export class HotelService extends BaseService<HotelEntity> {
   }
 
   async createHotel(data: CreateHotelDto): Promise<HotelEntity> {
-    await this.userService.createFirebaseUser(data.email);
-    await this.userService.createUser(data.email, RoleTypes.HOTEL, true);
+    const user = await this.userService.createUser({
+      email: data.email,
+      roleName: RoleTypes.HOTEL_MANAGER,
+      isVerified: true,
+      shouldCreateFirebaseUser: true,
+    });
     return this.createOne({
       ...data,
-      manager: { id: data.email, name: CommonUtils.getEmailName(data.email) },
+      manager: { id: data.email, name: CommonUtils.getEmailName(data.email), userId: user.id },
     });
   }
 
   async getMyHotel(user: UserEntity): Promise<HotelEntity> {
-    if (user.roleName === RoleTypes.HOTEL) {
+    if (user.roleName === RoleTypes.HOTEL_MANAGER) {
       return this.getHotelByEmail(user.id, { rooms: true });
     }
     if (user.roleName === RoleTypes.RECEPTIONIST) {

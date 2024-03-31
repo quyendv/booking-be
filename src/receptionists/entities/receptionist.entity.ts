@@ -4,6 +4,7 @@ import { AddressEntity } from '~/address/entities/address.entity';
 import { TimestampEntity } from '~/base/a.base.entity';
 import { GenderTypes } from '~/customers/constants/customer.constant';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
+import { UserEntity } from '~/users/entities/user.entity';
 
 @Entity('receptionists')
 export class ReceptionistEntity extends TimestampEntity {
@@ -39,6 +40,10 @@ export class ReceptionistEntity extends TimestampEntity {
   @JoinColumn({ name: 'address_id' })
   address: AddressEntity;
 
+  @OneToOne(() => UserEntity, (user) => user.receptionist, { nullable: true })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
+
   // Foreign Keys
   @Exclude({ toPlainOnly: true })
   @Column('int', { name: 'address_id', nullable: true })
@@ -47,4 +52,8 @@ export class ReceptionistEntity extends TimestampEntity {
   @Exclude({ toPlainOnly: true })
   @Column('int', { name: 'hotel_id' })
   hotelId: number;
+
+  @Exclude({ toPlainOnly: true })
+  @Column('varchar', { name: 'user_id' })
+  userId: string;
 }

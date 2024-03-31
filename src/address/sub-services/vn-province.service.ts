@@ -1,23 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { CommonUtils } from '~/base/utils/common.utils';
-import AppDataSource from '~/configs/orm.config';
 import { VnProvince, VnProvinceRaw } from '../types/vn-provinces.type';
 
 @Injectable()
 export class VnProvinceService {
-  manager: EntityManager;
-
-  constructor() {
-    AppDataSource.initialize()
-      .then(() => {
-        Logger.log('Data Source has been initialized!', 'Initialize DataSource');
-        this.manager = AppDataSource.manager;
-      })
-      .catch((err) => {
-        Logger.error('Error during Data Source initialization', err);
-      });
-  }
+  constructor(@InjectEntityManager() private readonly manager: EntityManager) {}
 
   async list(): Promise<VnProvince[]> {
     const result = (await this.manager

@@ -1,6 +1,6 @@
 export enum RoleTypes {
   ADMIN = 'admin',
-  HOTEL = 'hotel',
+  HOTEL_MANAGER = 'hotel_manager',
   RECEPTIONIST = 'receptionist',
   CUSTOMER = 'customer',
 }

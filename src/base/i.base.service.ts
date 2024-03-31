@@ -44,9 +44,15 @@ export interface IBaseService<T> {
 
   softDelete(id: EntityId): Promise<UpdateResult>;
 
+  softDeleteMany(ids: EntityId[]): Promise<UpdateResult>;
+
   restore(id: EntityId): Promise<UpdateResult>;
 
+  restoreMany(ids: EntityId[]): Promise<UpdateResult>;
+
   permanentDelete(id: EntityId): Promise<DeleteResult>;
+
+  permanentDeleteMany(ids: EntityId[]): Promise<DeleteResult>;
 
   // Special
   findOneOrCreate(data: DeepPartial<T>, options?: FindOneOptions<T>): Promise<T>;

@@ -36,7 +36,7 @@ export class AbilityFactory {
       can(PermissionActions.MANAGE, 'all');
     }
 
-    if (role === RoleTypes.HOTEL) {
+    if (role === RoleTypes.HOTEL_MANAGER) {
       const hotel = await this.hotelService.getHotelByEmail(user.id, {
         rooms: true,
         receptionists: true,

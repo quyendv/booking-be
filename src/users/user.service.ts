@@ -10,17 +10,18 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as admin from 'firebase-admin';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { UserPayload } from '~/auth/types/request.type';
 import { BaseService } from '~/base/a.base.service';
 import { CommonUtils } from '~/base/utils/common.utils';
 import { CustomerService } from '~/customers/customer.service';
 import { CreateCustomerDto } from '~/customers/dto/create-customer.dto';
-import { HotelService } from '~/hotels/hotel.service';
 import { RoleTypes } from './constants/user.constant';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { UserEntity } from './entities/user.entity';
+import { UserHelper } from './helpers/user.helper';
 import { RoleService } from './sub-services/role.service';
-import { CurrentAccountInfo } from './types/user.type';
+import { AccountInfo } from './types/user.type';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -29,24 +30,34 @@ export class UserService extends BaseService<UserEntity> {
     private readonly roleService: RoleService,
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
-    @Inject(forwardRef(() => CustomerService)) private readonly hotelService: HotelService,
   ) {
     super(repository);
   }
 
-  getUserByEmail(email: string, isVerified?: boolean): Promise<UserEntity | null> {
+  getUserByEmail(
+    email: string,
+    isVerified?: boolean,
+    relations?: FindOptionsRelations<UserEntity>,
+  ): Promise<UserEntity | null> {
     const condition: FindOptionsWhere<UserEntity> | FindOptionsWhere<UserEntity>[] = { id: email };
     if (isVerified !== undefined) condition.isVerified = isVerified;
-    return this.findOne({ where: condition }); // role is eager (always populate)
+    return this.findOne({ where: condition, relations }); // role is eager (always populate)
   }
 
-  async createUser(email: string, roleName: RoleTypes, isVerified = false): Promise<UserEntity> {
+  async createUser({
+    email,
+    roleName,
+    isVerified = false,
+    shouldCreateFirebaseUser = false,
+  }: CreateUserDto): Promise<UserEntity> {
     const existingUser = await this.getUserByEmail(email);
     if (existingUser) {
       throw new BadRequestException(`User "${email}" already exists`);
     }
     const role = await this.roleService.getRoleByName(roleName);
-    return this.createOne({ id: email, isVerified, role });
+    const user = await this.createOne({ id: email, isVerified, role });
+    if (shouldCreateFirebaseUser) await this.createFirebaseUser(email);
+    return user;
   }
 
   async createFirebaseUser(email: string, password?: string): Promise<void> {
@@ -65,10 +76,10 @@ export class UserService extends BaseService<UserEntity> {
     }
   }
 
-  async deleteFirebaseUser(email: string): Promise<void> {
+  private async deleteFirebaseUser(email: string): Promise<void> {
     try {
       const { uid } = await admin.auth().getUserByEmail(email);
-      await admin.auth().deleteUser(uid);
+      await admin.auth().deleteUser(uid); // deleteUsers([uid])
     } catch (error) {
       if (error.errorInfo?.code === 'auth/user-not-found') {
         // throw new NotFoundException('User not found.');
@@ -80,9 +91,22 @@ export class UserService extends BaseService<UserEntity> {
   /**
    * Sign Up Customer
    */
-  async createUnverifiedCustomer(dto: CreateCustomerDto): Promise<UserEntity> {
-    const user = await this.createUser(dto.email, RoleTypes.CUSTOMER, false);
-    await this.customerService.createCustomer(dto);
+  async createUnverifiedCustomer(
+    dto: CreateCustomerDto,
+    shouldCreateFirebaseUser = false,
+  ): Promise<UserEntity> {
+    const user = await this.createUser({
+      email: dto.email,
+      roleName: RoleTypes.CUSTOMER,
+      isVerified: false,
+      shouldCreateFirebaseUser,
+    });
+    await this.customerService.createOne({
+      ...dto,
+      id: dto.email,
+      name: dto.name ?? CommonUtils.getEmailName(dto.email),
+      userId: user.id,
+    });
     return user;
   }
 
@@ -99,41 +123,40 @@ export class UserService extends BaseService<UserEntity> {
     return this.updateOne(user.id, { isVerified: true });
   }
 
-  async getCurrentInfo(payload: UserPayload): Promise<CurrentAccountInfo> {
-    const user = await this.getUserByEmail(payload.email);
+  async getCurrentInfo(payload: UserPayload, isVerified?: boolean): Promise<AccountInfo> {
+    const user = await this.getUserByEmail(payload.email, isVerified, {
+      hotelManager: true,
+      customer: true,
+      receptionist: true,
+    });
     if (!user) throw new NotFoundException(`User ${payload.email} not found`);
-    if (user.roleName === RoleTypes.ADMIN) {
-      return {
-        id: user.id,
-        email: user.id,
-        isVerify: user.isVerified,
-        role: user.roleName,
-        avatar: payload.picture,
-        name: payload.name ?? CommonUtils.getEmailName(payload.email),
-      };
+    return UserHelper.transformAccountInfo(user, payload);
+  }
+
+  async listAccountInfo(): Promise<AccountInfo[]> {
+    const users = await this.findAll({
+      // where: { role: { name: Not(RoleTypes.ADMIN) } },
+      relations: { customer: true, hotelManager: true, receptionist: true },
+    });
+    return users.map((user) => UserHelper.transformAccountInfo(user));
+  }
+
+  async deleteAccount(email: string): Promise<void> {
+    await this.permanentDelete(email);
+    await this.deleteFirebaseUser(email);
+  }
+
+  async deleteAccounts(emails: string[]): Promise<void> {
+    try {
+      await this.permanentDeleteMany(emails);
+      const { users /*, notFound */ } = await admin
+        .auth()
+        .getUsers(emails.map((email) => ({ email })));
+      await admin.auth().deleteUsers(users.map((user) => user.uid));
+    } catch (error) {
+      if (error.errorInfo?.code === 'auth/user-not-found') {
+        Logger.warn('User not found in Firebase.', 'UserService.deleteFirebaseUser');
+      } else throw error;
     }
-    if (user.roleName === RoleTypes.CUSTOMER) {
-      const customer = await this.customerService.getCustomerByEmail(payload.email);
-      return {
-        id: customer.id,
-        email: user.id,
-        name: customer.name,
-        role: user.roleName,
-        isVerify: user.isVerified,
-        avatar: customer.avatar ?? undefined,
-      };
-    }
-    if (user.roleName === RoleTypes.HOTEL) {
-      const hotel = await this.hotelService.getHotelByEmail(payload.email);
-      return {
-        id: hotel.id,
-        email: user.id,
-        name: hotel.name,
-        role: user.roleName,
-        isVerify: user.isVerified,
-        avatar: hotel.imageUrl ?? undefined,
-      };
-    }
-    throw new InternalServerErrorException(`Role "${user.roleName}" is not supported`);
   }
 }

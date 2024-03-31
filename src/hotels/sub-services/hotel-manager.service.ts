@@ -11,6 +11,12 @@ export class HotelManagerService extends BaseService<HotelManagerEntity> {
     super(repository);
   }
 
+  async getHotelManagerByEmail(email: string): Promise<HotelManagerEntity> {
+    const manager = await this.findOne({ where: { id: email } });
+    if (!manager) throw new NotFoundException('Hotel Manager not found.');
+    return manager;
+  }
+
   async updateHotelManager(body: UpdateHotelManagerDto): Promise<HotelManagerEntity> {
     const manager = await this.findOne({ where: { id: body.email } });
     if (!manager) throw new NotFoundException('Hotel Manager not found to update.');

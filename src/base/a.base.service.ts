@@ -71,12 +71,24 @@ export abstract class BaseService<T extends ABaseEntity> implements IBaseService
     return this._repository.softDelete(id);
   }
 
+  softDeleteMany(ids: EntityId[]): Promise<UpdateResult> {
+    return this._repository.softDelete(ids as any);
+  }
+
   restore(id: EntityId): Promise<UpdateResult> {
     return this._repository.restore(id);
   }
 
+  restoreMany(ids: EntityId[]): Promise<UpdateResult> {
+    return this._repository.restore(ids as any);
+  }
+
   permanentDelete(id: EntityId): Promise<DeleteResult> {
     return this._repository.delete(id);
+  }
+
+  permanentDeleteMany(ids: EntityId[]): Promise<DeleteResult> {
+    return this._repository.delete(ids as any);
   }
 
   // *** Advanced: // FIXME: see findOrCreate of sequelize
