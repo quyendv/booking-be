@@ -3,6 +3,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Patch,
   Post,
@@ -26,6 +27,8 @@ import { CustomerEntity } from './entities/customer.entity';
 import { ListCustomerQueryDto } from './dto/list-customer.dto';
 import { UserService } from '~/users/user.service';
 import { In } from 'typeorm';
+import { BaseResponse } from '~/base/types/response.type';
+import { DeleteCustomerDto } from './dto/delete-customer.dto';
 
 @ApiTags('Customers')
 @Controller('customers')
@@ -78,6 +81,11 @@ export class CustomerController {
       return this.customerService.findAll({ where: { id: In(users.map((user) => user.id)) } });
     }
     return this.customerService.findAll();
+  }
+
+  @Delete()
+  async deleteCustomer(@Query() dto: DeleteCustomerDto): Promise<BaseResponse> {
+    return this.customerService.deleteCustomer(dto.emails);
   }
 
   // @Patch('info') // ':id/info'

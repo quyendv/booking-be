@@ -31,12 +31,17 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
   }
 
   async createReceptionist(dto: CreateReceptionistDto): Promise<ReceptionistEntity> {
-    await this.userService.createUser(dto.email, RoleTypes.RECEPTIONIST, true);
-    await this.userService.createFirebaseUser(dto.email);
+    const user = await this.userService.createUser({
+      email: dto.email,
+      roleName: RoleTypes.RECEPTIONIST,
+      isVerified: true,
+      shouldCreateFirebaseUser: true,
+    });
     return this.createOne({
       ...dto,
       id: dto.email,
       name: dto.name ?? CommonUtils.getEmailName(dto.email),
+      userId: user.id,
     });
   }
 
@@ -59,14 +64,13 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
     const receptionist = await this.findOne({ where: { id: email } });
     if (!receptionist) throw new NotFoundException('Receptionist not found to delete.');
 
-    await this.userService.permanentDelete(email);
-    await this.userService.deleteFirebaseUser(email);
-    // TODO: delete storage file
-
     await this.permanentDelete(email);
     if (receptionist.addressId) {
       await this.addressService.permanentDelete(receptionist.addressId);
     }
+    // TODO: delete storage file
+
+    await this.userService.deleteAccount(email);
 
     return { status: 'success', message: 'Receptionist deleted successfully' };
   }

@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, In, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
 import { CommonUtils } from '~/base/utils/common.utils';
 import { UserEntity } from '~/users/entities/user.entity';
@@ -8,12 +8,15 @@ import { UserService } from '~/users/user.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
+import { AddressService } from '~/address/address.service';
+import { BaseResponse } from '~/base/types/response.type';
 
 @Injectable()
 export class CustomerService extends BaseService<CustomerEntity> {
   constructor(
-    @InjectRepository(CustomerEntity) repository: Repository<CustomerEntity>,
+    @InjectRepository(CustomerEntity) private readonly repository: Repository<CustomerEntity>,
     @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
+    private readonly addressService: AddressService,
   ) {
     super(repository);
   }
@@ -27,23 +30,8 @@ export class CustomerService extends BaseService<CustomerEntity> {
     return customer;
   }
 
-  async createCustomer(dto: CreateCustomerDto): Promise<CustomerEntity> {
-    return this.createOne({
-      ...dto,
-      id: dto.email,
-      name: dto.name ?? CommonUtils.getEmailName(dto.email),
-      // avatar: dto.avatar,
-      // avatarKey: dto.avatar,
-      // address: dto.address ? { ...dto.address } : undefined,
-    });
-  }
-
   async createTestCustomerAccount(dto: CreateCustomerDto): Promise<UserEntity> {
-    // Create if not exists (Firebase) (with default password - not throw error if exists)
-    await this.userService.createFirebaseUser(dto.email);
-
-    // Create if not exists (DB) - throw error if exists
-    return this.userService.createUnverifiedCustomer(dto);
+    return this.userService.createUnverifiedCustomer(dto, true);
   }
 
   async updateCustomer(dto: UpdateCustomerDto): Promise<CustomerEntity> {
@@ -59,6 +47,23 @@ export class CustomerService extends BaseService<CustomerEntity> {
           ? { id: customer.addressId, ...dto.address }
           : dto.address,
     });
+  }
+
+  async deleteCustomer(emails: string[]): Promise<BaseResponse> {
+    const users = await this.userService.findAll({
+      where: { id: In(emails), isVerified: false },
+      relations: { customer: true },
+    });
+    if (users.length !== emails.length) {
+      throw new NotFoundException('Some unverified customers not found.');
+    }
+
+    const addressIds = users.map((user) => user.customer?.addressId).filter((id) => id);
+    await this.repository.delete(emails);
+    if (addressIds.length > 0) await this.addressService.permanentDeleteMany(addressIds);
+
+    await this.userService.deleteAccounts(emails);
+    return { status: 'success', message: 'Deleted successfully.' };
   }
 
   // async updateInfo(dto: UpdateCustomerInfoDto): Promise<CustomerEntity> {

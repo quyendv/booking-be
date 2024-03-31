@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Get,
   Post,
   UseGuards,
   UseInterceptors,
@@ -9,7 +10,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { BaseResponse } from '~/base/types/response.type';
 import { UserEntity } from '~/users/entities/user.entity';
-import { CurrentAccountInfo } from '~/users/types/user.type';
+import { AccountInfo } from '~/users/types/user.type';
 import { UserService } from '~/users/user.service';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
@@ -32,7 +33,7 @@ export class AuthController {
   ) {}
 
   @Post('sign-in')
-  signIn(@AuthUser() user: UserPayload): Promise<CurrentAccountInfo> {
+  signIn(@AuthUser() user: UserPayload): Promise<AccountInfo> {
     // return this.authService.signIn(user);
     return this.userService.getCurrentInfo(user);
   }
@@ -52,5 +53,11 @@ export class AuthController {
   @Roles([PermissionActions.CREATE, 'firebase-account'])
   createFirebaseAccount(@Body() body: { email: string }): Promise<void> {
     return this.userService.createFirebaseUser(body.email);
+  }
+
+  @Get('users')
+  @Roles([PermissionActions.LIST, UserEntity])
+  listUsers(): Promise<AccountInfo[]> {
+    return this.userService.listAccountInfo();
   }
 }

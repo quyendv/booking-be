@@ -1,6 +1,6 @@
 import { RoleTypes } from '../constants/user.constant';
 
-export type CurrentAccountInfo = {
+export type AccountInfo = {
   // id: string | number; // hotel: int, customer/admin: email
   email: string;
   isVerified: boolean;
