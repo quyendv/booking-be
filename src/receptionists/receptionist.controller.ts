@@ -33,7 +33,7 @@ export class ReceptionistController {
       .setMessage('Admin or Owner Hotel can create receptionist.')
       .throwUnlessCan(
         PermissionActions.CREATE,
-        this.receptionistService.createInstance({ id: dto.email, hotelId: dto.hotelId }),
+        this.receptionistService._createInstance({ id: dto.email, hotelId: dto.hotelId }),
       );
     return this.receptionistService.createReceptionist(dto);
   }
@@ -48,7 +48,7 @@ export class ReceptionistController {
       .setMessage('Admin or Owner Hotel can update receptionist.')
       .throwUnlessCan(
         PermissionActions.CREATE,
-        this.receptionistService.createInstance({ id: dto.email }),
+        this.receptionistService._createInstance({ id: dto.email }),
       );
     return this.receptionistService.updateReceptionist(dto);
   }
@@ -63,13 +63,13 @@ export class ReceptionistController {
       .setMessage('Admin or Owner Hotel can delete receptionist.')
       .throwUnlessCan(
         PermissionActions.DELETE,
-        this.receptionistService.createInstance({ id: email }),
+        this.receptionistService._createInstance({ id: email }),
       );
     return this.receptionistService.deleteReceptionist(email);
   }
 
   @Get()
   listReceptionists(@Query() query: ListReceptionistQueryDto): Promise<ReceptionistEntity[]> {
-    return this.receptionistService.findAll({ where: { hotelId: query.hotelId } });
+    return this.receptionistService._findAll({ where: { hotelId: query.hotelId } });
   }
 }

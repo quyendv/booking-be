@@ -14,23 +14,23 @@ import { UpsertOptions } from 'typeorm/repository/UpsertOptions';
 
 export interface IBaseService<T> {
   // Common
-  createInstance(data: DeepPartial<T>): T;
+  _createInstance(data: DeepPartial<T>): T;
 
-  createOne(data: DeepPartial<T>): Promise<T>;
+  _createOne(data: DeepPartial<T>): Promise<T>;
 
-  createMany(data: DeepPartial<T>[]): Promise<T[]>;
+  _createMany(data: DeepPartial<T>[]): Promise<T[]>;
 
-  findById(id: EntityId, options?: FindOneOptions<T>): Promise<T | null>;
+  _findById(id: EntityId, options?: FindOneOptions<T>): Promise<T | null>;
 
-  findByIds(ids: EntityId[], options?: FindOneOptions<T>): Promise<T[]>;
+  _findByIds(ids: EntityId[], options?: FindOneOptions<T>): Promise<T[]>;
 
-  findOne(options: FindOneOptions<T>): Promise<T | null>;
+  _findOne(options: FindOneOptions<T>): Promise<T | null>;
 
-  findAll(options?: FindManyOptions<T>): Promise<T[]>;
+  _findAll(options?: FindManyOptions<T>): Promise<T[]>;
 
-  updateOne(id: EntityId, data: DeepPartial<T>): Promise<T>; // update by id
+  _updateOne(id: EntityId, data: DeepPartial<T>): Promise<T>; // update by id
 
-  update(
+  _update(
     criteria:
       | string
       | string[]
@@ -44,20 +44,47 @@ export interface IBaseService<T> {
     partialEntity: QueryDeepPartialEntity<T>,
   ): Promise<UpdateResult>; // update by ids or conditions
 
-  softDelete(id: EntityId): Promise<UpdateResult>;
+  _softDelete(
+    criteria:
+      | string
+      | string[]
+      | number
+      | number[]
+      | Date
+      | Date[]
+      | ObjectId
+      | ObjectId[]
+      | FindOptionsWhere<T>,
+  ): Promise<UpdateResult>;
 
-  softDeleteMany(ids: EntityId[]): Promise<UpdateResult>;
+  _restore(
+    criteria:
+      | string
+      | string[]
+      | number
+      | number[]
+      | Date
+      | Date[]
+      | ObjectId
+      | ObjectId[]
+      | FindOptionsWhere<T>,
+  ): Promise<UpdateResult>;
 
-  restore(id: EntityId): Promise<UpdateResult>;
-
-  restoreMany(ids: EntityId[]): Promise<UpdateResult>;
-
-  permanentDelete(id: EntityId): Promise<DeleteResult>;
-
-  permanentDeleteMany(ids: EntityId[]): Promise<DeleteResult>;
+  _permanentDelete(
+    criteria:
+      | string
+      | string[]
+      | number
+      | number[]
+      | Date
+      | Date[]
+      | ObjectId
+      | ObjectId[]
+      | FindOptionsWhere<T>,
+  ): Promise<DeleteResult>;
 
   // Special
-  findOneOrCreate(data: DeepPartial<T>, options?: FindOneOptions<T>): Promise<T>;
+  _findOneOrCreate(data: DeepPartial<T>, options?: FindOneOptions<T>): Promise<T>;
 
   _upsert(
     entityOrEntities: QueryDeepPartialEntity<T> | QueryDeepPartialEntity<T>[],

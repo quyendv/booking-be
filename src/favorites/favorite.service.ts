@@ -14,7 +14,7 @@ export class FavoriteService extends BaseService<FavoriteEntity> {
   }
 
   async listFavoriteHotels(customerEmail: string): Promise<HotelEntity[]> {
-    const response = await this.findAll({
+    const response = await this._findAll({
       where: { customerEmail: customerEmail },
       relations: { hotel: true },
     });
@@ -31,7 +31,7 @@ export class FavoriteService extends BaseService<FavoriteEntity> {
   }
 
   async removeFavoriteHotel(customerEmail: string, hotelId: number): Promise<BaseResponse> {
-    const response = await this.delete({ customerEmail, hotelId });
+    const response = await this._permanentDelete({ customerEmail, hotelId });
     if (response.affected === 0) {
       throw new NotFoundException('Favorite hotel not found');
     }

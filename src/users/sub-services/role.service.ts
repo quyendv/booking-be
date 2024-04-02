@@ -12,7 +12,7 @@ export class RoleService extends BaseService<RoleEntity> {
   }
 
   async getRoleByName(name: RoleTypes): Promise<RoleEntity> {
-    const role = await this.findOne({ where: { name } });
+    const role = await this._findOne({ where: { name } });
     if (!role) {
       throw new InternalServerErrorException(`Role "${name}" not found. Require initialization`);
     }

@@ -57,7 +57,7 @@ export class HotelController {
       .setMessage('Admin or Owner Hotel Manager can update info.')
       .throwUnlessCan(
         PermissionActions.UPDATE,
-        this.hotelManagerService.createInstance({ id: body.email }),
+        this.hotelManagerService._createInstance({ id: body.email }),
       );
     return this.hotelManagerService.updateHotelManager(body);
   }
@@ -84,7 +84,7 @@ export class HotelController {
     const ability = await this.abilityService.getAbilityByEmail(user.email);
     ForbiddenError.from(ability)
       .setMessage('Admin or Owner Hotel can update info.')
-      .throwUnlessCan(PermissionActions.UPDATE, this.hotelService.createInstance({ id: +id }));
+      .throwUnlessCan(PermissionActions.UPDATE, this.hotelService._createInstance({ id: +id }));
     return this.hotelService.updateHotel(+id, body);
   }
 
@@ -98,7 +98,7 @@ export class HotelController {
   @Public()
   // @Roles([PermissionActions.LIST, HotelEntity])
   listHotels(): Promise<HotelEntity[]> {
-    return this.hotelService.findAll({ relations: { rooms: true } });
+    return this.hotelService._findAll({ relations: { rooms: true } });
   }
 
   @Post(':id/rooms')
@@ -118,7 +118,7 @@ export class HotelController {
     const ability = await this.abilityService.getAbilityByEmail(user.email);
     ForbiddenError.from(ability)
       .setMessage('Admin or Owner Hotel can update info.')
-      .throwUnlessCan(PermissionActions.UPDATE, this.roomService.createInstance({ id: +roomId }));
+      .throwUnlessCan(PermissionActions.UPDATE, this.roomService._createInstance({ id: +roomId }));
     return this.hotelService.updateRoom(+roomId, body);
   }
 
@@ -131,7 +131,7 @@ export class HotelController {
     const ability = await this.abilityService.getAbilityByEmail(user.email);
     ForbiddenError.from(ability)
       .setMessage('Admin or Owner Hotel can delete info.')
-      .throwUnlessCan(PermissionActions.DELETE, this.roomService.createInstance({ id: +roomId }));
+      .throwUnlessCan(PermissionActions.DELETE, this.roomService._createInstance({ id: +roomId }));
     return this.hotelService.deleteRoom(+roomId);
   }
 

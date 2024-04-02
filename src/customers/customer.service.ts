@@ -25,7 +25,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
     email: string,
     options?: FindOneOptions<CustomerEntity>,
   ): Promise<CustomerEntity> {
-    const customer = await this.findById(email, options);
+    const customer = await this._findById(email, options);
     if (!customer) throw new NotFoundException('Customer not found.');
     return customer;
   }
@@ -35,12 +35,12 @@ export class CustomerService extends BaseService<CustomerEntity> {
   }
 
   async updateCustomer(dto: UpdateCustomerDto): Promise<CustomerEntity> {
-    const customer = await this.findOne({ where: { id: dto.email } });
+    const customer = await this._findOne({ where: { id: dto.email } });
     if (!customer) throw new NotFoundException('Customer not found to update.');
 
     const { email, ...data } = dto;
 
-    return this.updateOne(email, {
+    return this._updateOne(email, {
       ...data,
       address:
         dto.address && customer.addressId
@@ -50,7 +50,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
   }
 
   async deleteCustomer(emails: string[]): Promise<BaseResponse> {
-    const users = await this.userService.findAll({
+    const users = await this.userService._findAll({
       where: { id: In(emails), isVerified: false },
       relations: { customer: true },
     });
@@ -60,17 +60,17 @@ export class CustomerService extends BaseService<CustomerEntity> {
 
     const addressIds = users.map((user) => user.customer?.addressId).filter((id) => id);
     await this.repository.delete(emails);
-    if (addressIds.length > 0) await this.addressService.permanentDeleteMany(addressIds);
+    if (addressIds.length > 0) await this.addressService._permanentDelete(addressIds);
 
     await this.userService.deleteAccounts(emails);
     return { status: 'success', message: 'Deleted successfully.' };
   }
 
   // async updateInfo(dto: UpdateCustomerInfoDto): Promise<CustomerEntity> {
-  //   const customer = await this.findOne({ where: { id: dto.email } });
+  //   const customer = await this._findOne({ where: { id: dto.email } });
   //   if (!customer) throw new NotFoundException('Customer not found to update.');
 
-  //   return this.updateOne(dto.email, {
+  //   return this._updateOne(dto.email, {
   //     name: dto.name,
   //     birthday: dto.birthday,
   //     phone: dto.phone,
@@ -85,7 +85,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
   // }
 
   // async updateAvatar(email: string, file: Express.Multer.File): Promise<CustomerEntity> {
-  //   const customer = await this.findOne({ where: { id: email } });
+  //   const customer = await this._findOne({ where: { id: email } });
   //   if (!customer) throw new NotFoundException('Customer not found to update.');
 
   //   const uploadResult = await this.storageService.uploadFile(
@@ -96,16 +96,16 @@ export class CustomerService extends BaseService<CustomerEntity> {
   //   if (customer.avatarKey) await this.storageService.delete(customer.avatarKey);
 
   //   if (!uploadResult) {
-  //     return this.updateOne(email, { avatar: null, avatarKey: null });
+  //     return this._updateOne(email, { avatar: null, avatarKey: null });
   //   }
-  //   return this.updateOne(email, { avatar: uploadResult.url, avatarKey: uploadResult.key });
+  //   return this._updateOne(email, { avatar: uploadResult.url, avatarKey: uploadResult.key });
   // }
 
   // async updateCustomer(
   //   dto: UpdateCustomerDto,
   //   file: Express.Multer.File | undefined,
   // ): Promise<CustomerEntity> {
-  //   const customer = await this.findOne({ where: { id: dto.email } });
+  //   const customer = await this._findOne({ where: { id: dto.email } });
   //   if (!customer) throw new NotFoundException('Customer not found to update.');
 
   //   const { email, ...data } = dto;
@@ -119,7 +119,7 @@ export class CustomerService extends BaseService<CustomerEntity> {
   //     );
   //     if (customer.avatarKey) await this.storageService.delete(customer.avatarKey);
   //   }
-  //   return this.updateOne(email, {
+  //   return this._updateOne(email, {
   //     ...data,
   //     avatar: !file ? undefined : uploadResult ? uploadResult.url : null,
   //     avatarKey: !file ? undefined : uploadResult ? uploadResult.key : null,

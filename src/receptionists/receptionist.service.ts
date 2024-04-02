@@ -25,7 +25,7 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
     id: string,
     relations?: FindOptionsRelations<ReceptionistEntity>,
   ): Promise<ReceptionistEntity> {
-    const receptionist = await this.findById(id, { relations: relations });
+    const receptionist = await this._findById(id, { relations: relations });
     if (!receptionist) throw new NotFoundException('Receptionist not found');
     return receptionist;
   }
@@ -37,7 +37,7 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
       isVerified: true,
       shouldCreateFirebaseUser: true,
     });
-    return this.createOne({
+    return this._createOne({
       ...dto,
       id: dto.email,
       name: dto.name ?? CommonUtils.getEmailName(dto.email),
@@ -46,12 +46,12 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
   }
 
   async updateReceptionist(dto: UpdateReceptionistDto): Promise<ReceptionistEntity> {
-    const receptionist = await this.findOne({ where: { id: dto.email } });
+    const receptionist = await this._findOne({ where: { id: dto.email } });
     if (!receptionist) throw new NotFoundException('Receptionist not found to update.');
 
     const { email, ...data } = dto;
 
-    return this.updateOne(email, {
+    return this._updateOne(email, {
       ...data,
       address:
         dto.address && receptionist.addressId
@@ -61,12 +61,12 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
   }
 
   async deleteReceptionist(email: string): Promise<BaseResponse> {
-    const receptionist = await this.findOne({ where: { id: email } });
+    const receptionist = await this._findOne({ where: { id: email } });
     if (!receptionist) throw new NotFoundException('Receptionist not found to delete.');
 
-    await this.permanentDelete(email);
+    await this._permanentDelete(email);
     if (receptionist.addressId) {
-      await this.addressService.permanentDelete(receptionist.addressId);
+      await this.addressService._permanentDelete(receptionist.addressId);
     }
     // TODO: delete storage file
 

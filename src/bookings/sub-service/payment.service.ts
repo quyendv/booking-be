@@ -113,7 +113,7 @@ export class PaymentService {
     let vnpayCode = vnp_Params['vnp_ResponseCode'];
 
     if (secureHash === signed) {
-      const updateResult = await this.bookingService.update(
+      const updateResult = await this.bookingService._update(
         { paymentId: orderId },
         { isPaid: true, paymentInfo: originalQueryParams },
       );
