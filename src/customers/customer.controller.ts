@@ -21,14 +21,14 @@ import { UserPayload } from '~/auth/types/request.type';
 import { PermissionActions } from '~/auth/types/role.type';
 import { UserEntity } from '~/users/entities/user.entity';
 import { CustomerService } from './customer.service';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { CreateCustomerDto } from './dtos/create-customer.dto';
+import { UpdateCustomerDto } from './dtos/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
-import { ListCustomerQueryDto } from './dto/list-customer.dto';
+import { ListCustomerQueryDto } from './dtos/list-customer.dto';
 import { UserService } from '~/users/user.service';
 import { In } from 'typeorm';
 import { BaseResponse } from '~/base/types/response.type';
-import { DeleteCustomerDto } from './dto/delete-customer.dto';
+import { DeleteCustomerDto } from './dtos/delete-customer.dto';
 
 @ApiTags('Customers')
 @Controller('customers')

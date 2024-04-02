@@ -8,7 +8,7 @@ import { UserEntity } from '~/users/entities/user.entity';
 import { UserService } from '~/users/user.service';
 import { UserPayload } from './types/request.type';
 import { DEFAULT_LOCALE } from '~/base/constants/locale.constant';
-import { MailerService } from '~/mailer/mailer.service';
+import { MailerService } from '~/mailers/mailer.service';
 
 @Injectable()
 export class AuthService {

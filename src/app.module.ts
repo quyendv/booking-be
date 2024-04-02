@@ -12,7 +12,7 @@ import envConfig, { envPath, envValidation } from './configs/env.config';
 import { CustomerModule } from './customers/customer.module';
 import { DatabaseModule } from './database/database.module';
 import { HotelModule } from './hotels/hotel.module';
-import { MailerModule } from './mailer/mailer.module';
+import { MailerModule } from './mailers/mailer.module';
 import { ReceptionistModule } from './receptionists/receptionist.module';
 import { ReviewModule } from './reviews/review.module';
 import { StorageModule } from './storage/storage.module';

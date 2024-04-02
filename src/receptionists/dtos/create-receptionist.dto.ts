@@ -1,5 +1,5 @@
 import { IsInt, IsNotEmpty } from 'class-validator';
-import { ProfileDto } from '~/base/dto/base.dto';
+import { ProfileDto } from '~/base/dtos/base.dto';
 
 export class CreateReceptionistDto extends ProfileDto {
   @IsNotEmpty()

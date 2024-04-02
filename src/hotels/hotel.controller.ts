@@ -22,17 +22,17 @@ import { UserPayload } from '~/auth/types/request.type';
 import { PermissionActions } from '~/auth/types/role.type';
 import { BaseResponse } from '~/base/types/response.type';
 import { UserEntity } from '~/users/entities/user.entity';
-import { CreateHotelDto } from './dto/create-hotel.dto';
-import { CreateRoomDto } from './dto/create-room.dto';
-import { UpdateHotelDto } from './dto/update-hotel.dto';
-import { UpdateRoomDto } from './dto/update-room.dto';
+import { CreateHotelDto } from './dtos/create-hotel.dto';
+import { CreateRoomDto } from './dtos/create-room.dto';
+import { UpdateHotelDto } from './dtos/update-hotel.dto';
+import { UpdateRoomDto } from './dtos/update-room.dto';
 import { HotelEntity } from './entities/hotel.entity';
 import { RoomEntity } from './entities/room.entity';
 import { HotelService } from './hotel.service';
 import { RoomService } from './sub-services/room.service';
 import { HotelManagerEntity } from './entities/hotel-manager.entity';
 import { HotelManagerService } from './sub-services/hotel-manager.service';
-import { UpdateHotelManagerDto } from './dto/update-hotel-manager.dto';
+import { UpdateHotelManagerDto } from './dtos/update-hotel-manager.dto';
 
 @ApiTags('Hotels')
 @Controller('hotels')

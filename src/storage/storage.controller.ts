@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
-import { StorageUploadDto, UploadByUrlDto } from './dto/storage.dto';
+import { StorageUploadDto, UploadByUrlDto } from './dtos/storage.dto';
 import { StorageService } from './storage.service';
 import { StorageUploadResult } from './types/storage.type';
 import { AuthGuard } from '~/auth/guards/auth.guard';

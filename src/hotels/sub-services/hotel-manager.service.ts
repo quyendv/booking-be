@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
 import { HotelManagerEntity } from '../entities/hotel-manager.entity';
-import { UpdateHotelManagerDto } from '../dto/update-hotel-manager.dto';
+import { UpdateHotelManagerDto } from '../dtos/update-hotel-manager.dto';
 
 @Injectable()
 export class HotelManagerService extends BaseService<HotelManagerEntity> {

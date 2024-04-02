@@ -23,11 +23,11 @@ import { PermissionActions } from '~/auth/types/role.type';
 import { BaseResponse } from '~/base/types/response.type';
 import { UserEntity } from '~/users/entities/user.entity';
 import { BookingService } from './booking.service';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { CreatePaymentUrlDto } from './dto/create-payment-url.dto';
+import { CreateBookingDto } from './dtos/create-booking.dto';
+import { CreatePaymentUrlDto } from './dtos/create-payment-url.dto';
 import { BookingEntity } from './entities/booking.entity';
 import { PaymentService } from './sub-service/payment.service';
-import { UpdateBookingDto } from './dto/update-booking.dto';
+import { UpdateBookingDto } from './dtos/update-booking.dto';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
 
 @ApiTags('Bookings')

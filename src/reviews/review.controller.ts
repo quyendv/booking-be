@@ -14,13 +14,13 @@ import { Roles } from '~/auth/decorators/role.decorator';
 import { AuthUser } from '~/auth/decorators/user.decorator';
 import { UserPayload } from '~/auth/types/request.type';
 import { PermissionActions } from '~/auth/types/role.type';
-import { CreateReviewDto } from '~/reviews/dto/create-review.dto';
+import { CreateReviewDto } from '~/reviews/dtos/create-review.dto';
 import { ReviewEntity } from './entities/review.entity';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '~/auth/guards/auth.guard';
 import { RolesGuard } from '~/auth/guards/role.guard';
-import { UpdateReviewDto } from './dto/update-review.dto';
+import { UpdateReviewDto } from './dtos/update-review.dto';
 
 @ApiTags('Reviews')
 @Controller('reviews')

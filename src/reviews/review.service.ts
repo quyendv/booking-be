@@ -11,9 +11,9 @@ import { AppAbility, PermissionActions } from '~/auth/types/role.type';
 import { BaseService } from '~/base/a.base.service';
 import { BookingService } from '~/bookings/booking.service';
 import { BookingStatus } from '~/bookings/constants/booking.constant';
-import { CreateReviewDto } from '~/reviews/dto/create-review.dto';
+import { CreateReviewDto } from '~/reviews/dtos/create-review.dto';
 import { ReviewEntity } from './entities/review.entity';
-import { UpdateReviewDto } from './dto/update-review.dto';
+import { UpdateReviewDto } from './dtos/update-review.dto';
 
 @Injectable()
 export class ReviewService extends BaseService<ReviewEntity> {

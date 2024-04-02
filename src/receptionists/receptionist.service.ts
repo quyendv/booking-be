@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
 import { UserService } from '~/users/user.service';
-import { CreateReceptionistDto } from './dto/create-receptionist.dto';
+import { CreateReceptionistDto } from './dtos/create-receptionist.dto';
 import { ReceptionistEntity } from './entities/receptionist.entity';
 import { CommonUtils } from '~/base/utils/common.utils';
 import { RoleTypes } from '~/users/constants/user.constant';
-import { UpdateReceptionistDto } from './dto/update-receptionist.dto';
+import { UpdateReceptionistDto } from './dtos/update-receptionist.dto';
 import { AddressService } from '~/address/address.service';
 import { BaseResponse } from '~/base/types/response.type';
 

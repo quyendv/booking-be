@@ -15,7 +15,7 @@ import { UserPayload } from '~/auth/types/request.type';
 import { BaseService } from '~/base/a.base.service';
 import { CommonUtils } from '~/base/utils/common.utils';
 import { CustomerService } from '~/customers/customer.service';
-import { CreateCustomerDto } from '~/customers/dto/create-customer.dto';
+import { CreateCustomerDto } from '~/customers/dtos/create-customer.dto';
 import { RoleTypes } from './constants/user.constant';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UserEntity } from './entities/user.entity';

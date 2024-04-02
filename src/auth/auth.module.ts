@@ -2,7 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { CustomerModule } from '~/customers/customer.module';
 import { HotelModule } from '~/hotels/hotel.module';
-import { MailerModule } from '~/mailer/mailer.module';
+import { MailerModule } from '~/mailers/mailer.module';
 import { ReceptionistModule } from '~/receptionists/receptionist.module';
 import { AbilityFactory } from './abilities/ability.factory';
 import { AuthController } from './auth.controller';

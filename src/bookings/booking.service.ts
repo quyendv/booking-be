@@ -18,8 +18,8 @@ import { HotelService } from '~/hotels/hotel.service';
 import { RoleTypes } from '~/users/constants/user.constant';
 import { UserEntity } from '~/users/entities/user.entity';
 import { BookingStatus, PaymentChannel } from './constants/booking.constant';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingDto } from './dto/update-booking.dto';
+import { CreateBookingDto } from './dtos/create-booking.dto';
+import { UpdateBookingDto } from './dtos/update-booking.dto';
 import { BookingEntity } from './entities/booking.entity';
 
 @Injectable()

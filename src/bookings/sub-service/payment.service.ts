@@ -7,7 +7,7 @@ import { BaseResponse } from '~/base/types/response.type';
 import { DateUtils } from '~/base/utils/date.utils';
 import { PaymentUtils } from '../utils/payment.utils';
 import { BookingService } from '../booking.service';
-import { CreatePaymentUrlDto } from '../dto/create-payment-url.dto';
+import { CreatePaymentUrlDto } from '../dtos/create-payment-url.dto';
 import { DEFAULT_LOCALE } from '~/base/constants/locale.constant';
 
 @Injectable()

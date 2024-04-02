@@ -16,7 +16,7 @@ import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { Roles } from './decorators/role.decorator';
 import { AuthUser } from './decorators/user.decorator';
-import { VerifyEmailDto } from './dto/verify-email.dto';
+import { VerifyEmailDto } from './dtos/verify-email.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/role.guard';
 import { UserPayload } from './types/request.type';

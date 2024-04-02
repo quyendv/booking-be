@@ -1,3 +1,3 @@
-import { ProfileDto } from '~/base/dto/base.dto';
+import { ProfileDto } from '~/base/dtos/base.dto';
 
 export class UpdateHotelManagerDto extends ProfileDto {}

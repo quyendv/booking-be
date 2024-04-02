@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { EmailDto } from '~/base/dto/base.dto';
+import { EmailDto } from '~/base/dtos/base.dto';
 import { RoleTypes } from '../constants/user.constant';
 
 export class CreateUserDto extends EmailDto {
