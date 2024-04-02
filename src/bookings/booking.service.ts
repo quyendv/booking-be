@@ -33,7 +33,7 @@ export class BookingService extends BaseService<BookingEntity> {
   }
 
   async getBookingById(id: string, isPaid?: boolean): Promise<BookingEntity> {
-    const booking = await this.findById(id);
+    const booking = await this._findById(id);
     if (!booking) {
       throw new NotFoundException(`Booking ${id} not found`);
     }
@@ -44,7 +44,7 @@ export class BookingService extends BaseService<BookingEntity> {
   }
 
   async getBookingByPaymentId(paymentId: string): Promise<BookingEntity> {
-    const booking = await this.findOne({ where: { paymentId } });
+    const booking = await this._findOne({ where: { paymentId } });
     if (!booking) {
       throw new NotFoundException(`Booking with paymentId ${paymentId} not found`);
     }
@@ -56,7 +56,7 @@ export class BookingService extends BaseService<BookingEntity> {
     dto: UpdateBookingDto,
     ability: AppAbility,
   ): Promise<BaseResponse> {
-    const booking = await this.findById(id);
+    const booking = await this._findById(id);
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
@@ -73,7 +73,7 @@ export class BookingService extends BaseService<BookingEntity> {
       }
     }
 
-    const updateResult = await this.update(id, { ...dto });
+    const updateResult = await this._update(id, { ...dto });
     if (updateResult.affected && updateResult.affected > 0) {
       return {
         status: 'success',
@@ -87,7 +87,7 @@ export class BookingService extends BaseService<BookingEntity> {
   async createBooking(dto: CreateBookingDto, customerEmail: string): Promise<BookingEntity> {
     // TODO: validate start, end date; total price
 
-    const existingBooking = await this.findOne({
+    const existingBooking = await this._findOne({
       where: {
         hotelId: dto.hotelId,
         roomId: dto.roomId,
@@ -108,7 +108,7 @@ export class BookingService extends BaseService<BookingEntity> {
     const customer = await this.customerService.getCustomerByEmail(customerEmail);
 
     const paymentId = this.generatePaymentId(dto.paymentChannel, customerEmail);
-    const booking = await this.createOne({
+    const booking = await this._createOne({
       ...dto,
       customerEmail,
       customerName: customer.name,
@@ -132,18 +132,18 @@ export class BookingService extends BaseService<BookingEntity> {
   async listMyBookings(user: UserEntity): Promise<BookingEntity[]> {
     switch (user.roleName) {
       case RoleTypes.CUSTOMER:
-        return this.findAll({
+        return this._findAll({
           where: { customerEmail: user.id },
           relations: { room: true, hotel: true, review: true },
         });
       case RoleTypes.HOTEL_MANAGER:
-        return this.findAll({
+        return this._findAll({
           where: { hotelOwnerEmail: user.id },
           relations: { room: true, hotel: true, review: true },
         });
       case RoleTypes.RECEPTIONIST:
         const hotel = await this.hotelService.getReceptionistHotel(user.id);
-        return this.findAll({
+        return this._findAll({
           where: { hotelId: hotel.id },
           relations: { room: true, hotel: true, review: true },
         });

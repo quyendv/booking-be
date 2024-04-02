@@ -25,12 +25,12 @@ export class ReviewService extends BaseService<ReviewEntity> {
   }
 
   async createReview(dto: CreateReviewDto, ability: AppAbility): Promise<ReviewEntity> {
-    const review = await this.findOne({ where: { bookingId: dto.bookingId } });
+    const review = await this._findOne({ where: { bookingId: dto.bookingId } });
     if (review) {
       throw new BadRequestException(`Review for booking ${dto.bookingId} already exists`);
     }
 
-    const booking = await this.bookingService.findById(dto.bookingId, {
+    const booking = await this.bookingService._findById(dto.bookingId, {
       relations: { customer: true },
     });
     if (!booking) {
@@ -38,13 +38,13 @@ export class ReviewService extends BaseService<ReviewEntity> {
     }
     ForbiddenError.from(ability)
       .setMessage('Admin or Owner Booking can add reviews.')
-      .throwUnlessCan(PermissionActions.CREATE, this.createInstance({ booking }));
+      .throwUnlessCan(PermissionActions.CREATE, this._createInstance({ booking }));
 
     if (booking.status !== BookingStatus.CHECKED_OUT) {
       throw new BadRequestException(`Booking ${dto.bookingId} is not completed`);
     }
 
-    const newReview = await this.createOne({
+    const newReview = await this._createOne({
       ...dto,
       customerName: booking.customer.name,
       customerImage: booking.customer.avatar ?? undefined,
@@ -54,7 +54,7 @@ export class ReviewService extends BaseService<ReviewEntity> {
       roomId: booking.roomId,
     });
 
-    const updateBookingResult = await this.bookingService.update(booking.id, {
+    const updateBookingResult = await this.bookingService._update(booking.id, {
       status: BookingStatus.REVIEWED,
     });
     if (!updateBookingResult.affected) {
@@ -65,7 +65,7 @@ export class ReviewService extends BaseService<ReviewEntity> {
   }
 
   async updateReview(id: string, dto: UpdateReviewDto, ability: AppAbility): Promise<ReviewEntity> {
-    const review = await this.findById(id);
+    const review = await this._findById(id);
     if (!review) {
       throw new NotFoundException(`Review ${id} not found`);
     }
@@ -73,18 +73,18 @@ export class ReviewService extends BaseService<ReviewEntity> {
       .setMessage('Admin or Owner Review can update reviews.')
       .throwUnlessCan(PermissionActions.UPDATE, review);
 
-    return this.updateOne(id, dto);
+    return this._updateOne(id, dto);
   }
 
   async listHotelReviews(hotelId: number): Promise<ReviewEntity[]> {
-    return this.findAll({ where: { hotelId } });
+    return this._findAll({ where: { hotelId } });
   }
 
   async listRoomReviews(roomId: number): Promise<ReviewEntity[]> {
-    return this.findAll({ where: { roomId } });
+    return this._findAll({ where: { roomId } });
   }
 
   async listCustomerReviews(customerEmail: string): Promise<ReviewEntity[]> {
-    return this.findAll({ where: { customerEmail } });
+    return this._findAll({ where: { customerEmail } });
   }
 }

@@ -39,6 +39,11 @@ export abstract class ABaseEntity extends TimestampEntity {
   id: EntityId;
 }
 
+export abstract class ABaseEntityWithoutTimestamp {
+  // @PrimaryGeneratedColumn('uuid)
+  id: EntityId;
+}
+
 export class UuidBaseEntity extends ABaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string; // EntityId

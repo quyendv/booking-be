@@ -57,7 +57,7 @@ export class CustomerController {
       .setMessage('Admin or Owner Customer can update info.')
       .throwUnlessCan(
         PermissionActions.UPDATE,
-        this.customerService.createInstance({ id: dto.email }),
+        this.customerService._createInstance({ id: dto.email }),
       );
     return this.customerService.updateCustomer(dto);
   }
@@ -69,7 +69,7 @@ export class CustomerController {
       .setMessage('Admin or Owner Customer can read info.')
       .throwUnlessCan(
         PermissionActions.UPDATE,
-        this.customerService.createInstance({ id: user.email }),
+        this.customerService._createInstance({ id: user.email }),
       );
     return this.customerService.getCustomerByEmail(user.email, { relations: { address: true } });
   }
@@ -77,10 +77,10 @@ export class CustomerController {
   @Get()
   async listCustomers(@Query() query: ListCustomerQueryDto): Promise<CustomerEntity[]> {
     if (query.isVerified) {
-      const users = await this.userService.findAll({ where: { isVerified: query.isVerified } });
-      return this.customerService.findAll({ where: { id: In(users.map((user) => user.id)) } });
+      const users = await this.userService._findAll({ where: { isVerified: query.isVerified } });
+      return this.customerService._findAll({ where: { id: In(users.map((user) => user.id)) } });
     }
-    return this.customerService.findAll();
+    return this.customerService._findAll();
   }
 
   @Delete()
@@ -98,7 +98,7 @@ export class CustomerController {
   //     .setMessage('Admin or Owner Customer can update info.')
   //     .throwUnlessCan(
   //       PermissionActions.UPDATE,
-  //       this.customerService.createInstance({ id: dto.email }),
+  //       this.customerService._createInstance({ id: dto.email }),
   //     );
   //   return this.customerService.updateInfo(dto);
   // }
@@ -121,7 +121,7 @@ export class CustomerController {
   //     .setMessage('Admin or Owner Customer can update info.')
   //     .throwUnlessCan(
   //       PermissionActions.UPDATE,
-  //       this.customerService.createInstance({ id: dto.email }),
+  //       this.customerService._createInstance({ id: dto.email }),
   //     );
   //   return this.customerService.updateAvatar(dto.email, file);
   // }
@@ -144,7 +144,7 @@ export class CustomerController {
   //     .setMessage('Admin or Owner Customer can update info.')
   //     .throwUnlessCan(
   //       PermissionActions.UPDATE,
-  //       this.customerService.createInstance({ id: dto.email }),
+  //       this.customerService._createInstance({ id: dto.email }),
   //     );
   //   return this.customerService.updateCustomer(dto, file);
   // }

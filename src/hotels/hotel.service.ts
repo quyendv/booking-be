@@ -41,7 +41,7 @@ export class HotelService extends BaseService<HotelEntity> {
       isVerified: true,
       shouldCreateFirebaseUser: true,
     });
-    return this.createOne({
+    return this._createOne({
       ...data,
       manager: { id: data.email, name: CommonUtils.getEmailName(data.email), userId: user.id },
     });
@@ -61,7 +61,7 @@ export class HotelService extends BaseService<HotelEntity> {
     receptionistEmail: string,
     relations?: FindOptionsRelations<HotelEntity>,
   ): Promise<HotelEntity> {
-    const hotel = await this.findOne({
+    const hotel = await this._findOne({
       where: { receptionists: { id: receptionistEmail } },
       relations: relations,
     });
@@ -73,7 +73,7 @@ export class HotelService extends BaseService<HotelEntity> {
     id: number,
     relations?: FindOptionsRelations<HotelEntity>,
   ): Promise<HotelEntity> {
-    const hotel = await this.findById(id, { relations: relations });
+    const hotel = await this._findById(id, { relations: relations });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }
@@ -82,7 +82,7 @@ export class HotelService extends BaseService<HotelEntity> {
     email: string,
     relations?: FindOptionsRelations<HotelEntity>,
   ): Promise<HotelEntity> {
-    const hotel = await this.findOne({ where: { email }, relations: relations });
+    const hotel = await this._findOne({ where: { email }, relations: relations });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }
@@ -94,7 +94,7 @@ export class HotelService extends BaseService<HotelEntity> {
       await this.storageService.delete(hotel.imageKey);
     }
 
-    return this.updateOne(id, {
+    return this._updateOne(id, {
       ...data,
       ...(data.address && {
         address: { ...data.address, id: hotel.address.id },
@@ -105,22 +105,22 @@ export class HotelService extends BaseService<HotelEntity> {
 
   async createRoom(hotelId: number, data: CreateRoomDto): Promise<RoomEntity> {
     await this.getHotelById(hotelId);
-    return this.roomService.createOne({ ...data, hotelId });
+    return this.roomService._createOne({ ...data, hotelId });
   }
 
   async updateRoom(roomId: number, data: UpdateRoomDto): Promise<RoomEntity> {
-    return this.roomService.updateOne(roomId, data);
+    return this.roomService._updateOne(roomId, data);
   }
 
   async deleteRoom(roomId: number): Promise<BaseResponse> {
-    const room = await this.roomService.findById(roomId);
+    const room = await this.roomService._findById(roomId);
     if (!room) throw new NotFoundException('Room not found');
 
     if (room.imageKey) await this.storageService.delete(room.imageKey);
     // TODO: remove gallery images
 
     try {
-      const response = await this.roomService.permanentDelete(roomId);
+      const response = await this.roomService._permanentDelete(roomId);
       if (response.affected === 0) {
         return { status: 'failure', message: 'Delete failed. Check query again.' };
       }
@@ -131,11 +131,11 @@ export class HotelService extends BaseService<HotelEntity> {
   }
 
   async listHotelRooms(hotelId: number): Promise<RoomEntity[]> {
-    return this.roomService.findAll({ where: { hotelId } });
+    return this.roomService._findAll({ where: { hotelId } });
   }
 
   async getHotelRoomById(roomId: number): Promise<RoomEntity> {
-    const room = await this.roomService.findById(roomId);
+    const room = await this.roomService._findById(roomId);
     if (!room) throw new NotFoundException('Room not found');
     return room;
   }

@@ -41,7 +41,7 @@ export class UserService extends BaseService<UserEntity> {
   ): Promise<UserEntity | null> {
     const condition: FindOptionsWhere<UserEntity> | FindOptionsWhere<UserEntity>[] = { id: email };
     if (isVerified !== undefined) condition.isVerified = isVerified;
-    return this.findOne({ where: condition, relations }); // role is eager (always populate)
+    return this._findOne({ where: condition, relations }); // role is eager (always populate)
   }
 
   async createUser({
@@ -55,7 +55,7 @@ export class UserService extends BaseService<UserEntity> {
       throw new BadRequestException(`User "${email}" already exists`);
     }
     const role = await this.roleService.getRoleByName(roleName);
-    const user = await this.createOne({ id: email, isVerified, role });
+    const user = await this._createOne({ id: email, isVerified, role });
     if (shouldCreateFirebaseUser) await this.createFirebaseUser(email);
     return user;
   }
@@ -101,7 +101,7 @@ export class UserService extends BaseService<UserEntity> {
       isVerified: false,
       shouldCreateFirebaseUser,
     });
-    await this.customerService.createOne({
+    await this.customerService._createOne({
       ...dto,
       id: dto.email,
       name: dto.name ?? CommonUtils.getEmailName(dto.email),
@@ -120,7 +120,7 @@ export class UserService extends BaseService<UserEntity> {
     if (user.isVerified) {
       throw new BadRequestException(`User "${email}" has already been verified`);
     }
-    return this.updateOne(user.id, { isVerified: true });
+    return this._updateOne(user.id, { isVerified: true });
   }
 
   async getCurrentInfo(payload: UserPayload, isVerified?: boolean): Promise<AccountInfo> {
@@ -134,7 +134,7 @@ export class UserService extends BaseService<UserEntity> {
   }
 
   async listAccountInfo(): Promise<AccountInfo[]> {
-    const users = await this.findAll({
+    const users = await this._findAll({
       // where: { role: { name: Not(RoleTypes.ADMIN) } },
       relations: { customer: true, hotelManager: true, receptionist: true },
     });
@@ -142,13 +142,13 @@ export class UserService extends BaseService<UserEntity> {
   }
 
   async deleteAccount(email: string): Promise<void> {
-    await this.permanentDelete(email);
+    await this._permanentDelete(email);
     await this.deleteFirebaseUser(email);
   }
 
   async deleteAccounts(emails: string[]): Promise<void> {
     try {
-      await this.permanentDeleteMany(emails);
+      await this._permanentDelete(emails);
       const { users /*, notFound */ } = await admin
         .auth()
         .getUsers(emails.map((email) => ({ email })));
