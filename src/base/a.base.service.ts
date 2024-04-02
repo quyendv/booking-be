@@ -5,16 +5,20 @@ import {
   FindOneOptions,
   FindOptionsWhere,
   In,
+  InsertResult,
   ObjectId,
   Repository,
   UpdateResult,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { EntityId } from 'typeorm/repository/EntityId';
-import { ABaseEntity } from './a.base.entity';
+import { UpsertOptions } from 'typeorm/repository/UpsertOptions';
+import { ABaseEntityWithoutTimestamp } from './a.base.entity';
 import { IBaseService } from './i.base.service';
 
-export abstract class BaseService<T extends ABaseEntity> implements IBaseService<T> {
+export abstract class BaseService<T extends ABaseEntityWithoutTimestamp>
+  implements IBaseService<T>
+{
   constructor(private readonly _repository: Repository<T>) {}
 
   createInstance(data: DeepPartial<T>): T {
@@ -83,6 +87,21 @@ export abstract class BaseService<T extends ABaseEntity> implements IBaseService
     return this._repository.restore(ids as any);
   }
 
+  delete(
+    criteria:
+      | string
+      | string[]
+      | number
+      | number[]
+      | Date
+      | Date[]
+      | ObjectId
+      | ObjectId[]
+      | FindOptionsWhere<T>,
+  ): Promise<DeleteResult> {
+    return this._repository.delete(criteria);
+  }
+
   permanentDelete(id: EntityId): Promise<DeleteResult> {
     return this._repository.delete(id);
   }
@@ -108,14 +127,13 @@ export abstract class BaseService<T extends ABaseEntity> implements IBaseService
   //   return [newEntity, true];
   // }
 
-  // Find by conflict path; if not exist then create; else update IF CHANGED
-  // upsertEntities(
-  //   entityOrEntities: QueryDeepPartialEntity<T> | QueryDeepPartialEntity<T>[],
-  //   conflictPaths: string[],
-  // ): Promise<InsertResult> {
-  //   return this._repository.upsert(entityOrEntities, {
-  //     conflictPaths,
-  //     skipUpdateIfNoValuesChanged: true,
-  //   });
-  // }
+  _upsert(
+    entityOrEntities: QueryDeepPartialEntity<T> | QueryDeepPartialEntity<T>[],
+    options: UpsertOptions<T> /* | string[] */,
+  ): Promise<InsertResult> {
+    return this._repository.upsert(entityOrEntities, {
+      skipUpdateIfNoValuesChanged: true,
+      ...options,
+    });
+  }
 }

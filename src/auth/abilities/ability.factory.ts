@@ -1,8 +1,15 @@
 import { AbilityBuilder, createMongoAbility, ExtractSubjectType } from '@casl/ability';
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BookingEntity } from '~/bookings/entities/booking.entity';
 import { CustomerEntity } from '~/customers/entities/customer.entity';
+import { FavoriteEntity } from '~/favorites/entities/favorite.entity';
+import { HotelManagerEntity } from '~/hotels/entities/hotel-manager.entity';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
+import { RoomEntity } from '~/hotels/entities/room.entity';
 import { HotelService } from '~/hotels/hotel.service';
+import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
+import { ReceptionistService } from '~/receptionists/receptionist.service';
+import { ReviewEntity } from '~/reviews/entities/review.entity';
 import { RoleTypes } from '~/users/constants/user.constant';
 import { UserEntity } from '~/users/entities/user.entity';
 import { UserService } from '~/users/user.service';
@@ -13,12 +20,6 @@ import {
   PermissionActions,
   PermissionSubjects,
 } from '../types/role.type';
-import { RoomEntity } from '~/hotels/entities/room.entity';
-import { BookingEntity } from '~/bookings/entities/booking.entity';
-import { ReviewEntity } from '~/reviews/entities/review.entity';
-import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
-import { ReceptionistService } from '~/receptionists/receptionist.service';
-import { HotelManagerEntity } from '~/hotels/entities/hotel-manager.entity';
 
 @Injectable()
 export class AbilityFactory {
@@ -30,10 +31,17 @@ export class AbilityFactory {
 
   async defineAbility(user: UserEntity): Promise<AppAbility> {
     const { can, cannot, build, rules } = new AbilityBuilder<AppAbility>(createMongoAbility);
-    const role = user.roleName;
 
+    // Common rules
+    can(PermissionActions.READ, HotelEntity);
+    can(PermissionActions.READ, RoomEntity);
+    can(PermissionActions.READ, ReviewEntity);
+
+    // User rules
+    const role = user.roleName;
     if (role === RoleTypes.ADMIN) {
       can(PermissionActions.MANAGE, 'all');
+      cannot(PermissionActions.MANAGE, FavoriteEntity);
     }
 
     if (role === RoleTypes.HOTEL_MANAGER) {
@@ -74,11 +82,9 @@ export class AbilityFactory {
           'booking.customerEmail': user.id,
         });
         can(PermissionActions.UPDATE, ReviewEntity, { customerEmail: user.id });
+        can(PermissionActions.MANAGE, FavoriteEntity, { customerEmail: user.id });
       }
     }
-    can(PermissionActions.READ, HotelEntity);
-    can(PermissionActions.READ, RoomEntity);
-    can(PermissionActions.READ, ReviewEntity);
 
     return build({
       detectSubjectType: (item) => item.constructor as ExtractSubjectType<PermissionSubjects>,

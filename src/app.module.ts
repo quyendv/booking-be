@@ -11,6 +11,7 @@ import { BookingModule } from './bookings/booking.module';
 import envConfig, { envPath, envValidation } from './configs/env.config';
 import { CustomerModule } from './customers/customer.module';
 import { DatabaseModule } from './database/database.module';
+import { FavoriteModule } from './favorites/favorite.module';
 import { HotelModule } from './hotels/hotel.module';
 import { MailerModule } from './mailers/mailer.module';
 import { ReceptionistModule } from './receptionists/receptionist.module';
@@ -37,6 +38,7 @@ import { UserModule } from './users/user.module';
     BookingModule,
     ReviewModule,
     ReceptionistModule,
+    FavoriteModule,
   ],
   controllers: [AppController],
   providers: [

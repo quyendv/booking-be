@@ -4,11 +4,13 @@ import {
   FindManyOptions,
   FindOneOptions,
   FindOptionsWhere,
+  InsertResult,
   ObjectId,
   UpdateResult,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { EntityId } from 'typeorm/repository/EntityId';
+import { UpsertOptions } from 'typeorm/repository/UpsertOptions';
 
 export interface IBaseService<T> {
   // Common
@@ -56,4 +58,9 @@ export interface IBaseService<T> {
 
   // Special
   findOneOrCreate(data: DeepPartial<T>, options?: FindOneOptions<T>): Promise<T>;
+
+  _upsert(
+    entityOrEntities: QueryDeepPartialEntity<T> | QueryDeepPartialEntity<T>[],
+    options: UpsertOptions<T> /* | string[] */,
+  ): Promise<InsertResult>;
 }
