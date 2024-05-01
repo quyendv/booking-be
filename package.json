@@ -20,7 +20,7 @@
     "migration:run": "npm run typeorm:cli -- migration:run -d src/configs/orm.config.ts",
     "migration:revert": "npm run typeorm:cli -- migration:revert -d src/configs/orm.config.ts",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --detectOpenHandles --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
@@ -99,6 +99,10 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1",
+      "^~/(.*)$": "<rootDir>/$1"
+    }
   }
 }
