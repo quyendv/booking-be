@@ -23,7 +23,7 @@ import { FavoriteEntity } from './entities/favorite.entity';
 import { FavoriteService } from './favorite.service';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
 
-@ApiTags('favorites')
+@ApiTags('Favorites')
 @Controller('favorites')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard, RolesGuard)

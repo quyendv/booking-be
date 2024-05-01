@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { UuidBaseEntity } from '~/base/a.base.entity';
 import { ColumnNumericTransformer } from '~/base/transformers/numeric.transformer';
@@ -65,6 +65,7 @@ export class BookingEntity extends UuidBaseEntity {
   @Column('varchar', { name: 'payment_id', unique: true })
   paymentId: string; // Payment ID from payment gateway: payment_intent_id (stripe), order_id (vn_pay)
 
+  @Exclude({ toPlainOnly: true })
   @Column('jsonb', { name: 'payment_info', nullable: true })
   paymentInfo: PaymentInfo; // Payment info from payment gateway
 

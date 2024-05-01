@@ -14,7 +14,7 @@ import { ReceptionistEntity } from './entities/receptionist.entity';
 import { ReceptionistService } from './receptionist.service';
 import { BaseResponse } from '~/base/types/response.type';
 
-@ApiTags('receptionists')
+@ApiTags('Receptionists')
 @Controller('receptionists')
 @UseGuards(AuthGuard, RolesGuard)
 export class ReceptionistController {

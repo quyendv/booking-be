@@ -73,10 +73,10 @@ export class HotelEntity extends SequenceBaseEntity {
   @Column('bool', { name: 'swimming_pool', default: false })
   swimmingPool: boolean;
 
-  @Column('bool', { name: 'allowPets', default: false })
+  @Column('bool', { name: 'allow_pets', default: false })
   allowPets: boolean;
 
-  @Column('bool', { name: 'allowSmoking', default: false })
+  @Column('bool', { name: 'allow_smoking', default: false })
   allowSmoking: boolean;
 
   @Column('jsonb', { name: 'time_rules' })
