@@ -12,6 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
 import { Roles } from '~/auth/decorators/role.decorator';
 import { AuthUser } from '~/auth/decorators/user.decorator';
@@ -19,16 +20,15 @@ import { AuthGuard } from '~/auth/guards/auth.guard';
 import { RolesGuard } from '~/auth/guards/role.guard';
 import { UserPayload } from '~/auth/types/request.type';
 import { PermissionActions } from '~/auth/types/role.type';
+import { BaseResponse } from '~/base/types/response.type';
 import { UserEntity } from '~/users/entities/user.entity';
+import { UserService } from '~/users/user.service';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
+import { DeleteCustomerDto } from './dtos/delete-customer.dto';
+import { CustomerInfoDto, ListCustomerQueryDto } from './dtos/list-customer.dto';
 import { UpdateCustomerDto } from './dtos/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
-import { ListCustomerQueryDto } from './dtos/list-customer.dto';
-import { UserService } from '~/users/user.service';
-import { In } from 'typeorm';
-import { BaseResponse } from '~/base/types/response.type';
-import { DeleteCustomerDto } from './dtos/delete-customer.dto';
 
 @ApiTags('Customers')
 @Controller('customers')
@@ -63,7 +63,7 @@ export class CustomerController {
   }
 
   @Get('me')
-  async getCurrentInfo(@AuthUser() user: UserPayload): Promise<CustomerEntity> {
+  async getCurrentInfo(@AuthUser() user: UserPayload): Promise<CustomerInfoDto> {
     const ability = await this.ability.getAbilityByEmail(user.email);
     ForbiddenError.from(ability)
       .setMessage('Admin or Owner Customer can read info.')
@@ -71,16 +71,20 @@ export class CustomerController {
         PermissionActions.UPDATE,
         this.customerService._createInstance({ id: user.email }),
       );
-    return this.customerService.getCustomerByEmail(user.email, { relations: { address: true } });
+    const response = await this.customerService.getCustomerByEmail(user.email, {
+      relations: { address: true, user: true },
+    });
+    return plainToInstance(CustomerInfoDto, response);
   }
 
   @Get()
-  async listCustomers(@Query() query: ListCustomerQueryDto): Promise<CustomerEntity[]> {
-    if (query.isVerified) {
-      const users = await this.userService._findAll({ where: { isVerified: query.isVerified } });
-      return this.customerService._findAll({ where: { id: In(users.map((user) => user.id)) } });
-    }
-    return this.customerService._findAll();
+  @Roles([PermissionActions.LIST, CustomerEntity])
+  async listCustomers(@Query() query: ListCustomerQueryDto): Promise<CustomerInfoDto[]> {
+    const response = await this.customerService._findAll({
+      where: { user: { isVerified: query.isVerified } },
+      relations: { address: true, user: true },
+    });
+    return plainToInstance(CustomerInfoDto, response) as any;
   }
 
   @Delete()
