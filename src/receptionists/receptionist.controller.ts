@@ -1,18 +1,39 @@
 import { ForbiddenError } from '@casl/ability';
-import { Body, Controller, Delete, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
+import { In } from 'typeorm';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
-import { AuthUser } from '~/auth/decorators/user.decorator';
+import { Roles } from '~/auth/decorators/role.decorator';
+import { AuthUser, GetAccountInfo } from '~/auth/decorators/user.decorator';
 import { AuthGuard } from '~/auth/guards/auth.guard';
 import { RolesGuard } from '~/auth/guards/role.guard';
 import { UserPayload } from '~/auth/types/request.type';
 import { PermissionActions } from '~/auth/types/role.type';
+import { BaseResponse } from '~/base/types/response.type';
+import { HotelService } from '~/hotels/hotel.service';
+import { RoleTypes } from '~/users/constants/user.constant';
+import { AccountInfo } from '~/users/types/user.type';
 import { CreateReceptionistDto } from './dtos/create-receptionist.dto';
-import { ListReceptionistQueryDto } from './dtos/list-receptionist.dto';
+import {
+  HotelReceptionistDto,
+  ListReceptionistQueryDto,
+  ReceptionistInfoDto,
+} from './dtos/list-receptionist.dto';
 import { UpdateReceptionistDto } from './dtos/update-receptionist.dto';
 import { ReceptionistEntity } from './entities/receptionist.entity';
 import { ReceptionistService } from './receptionist.service';
-import { BaseResponse } from '~/base/types/response.type';
 
 @ApiTags('Receptionists')
 @Controller('receptionists')
@@ -21,9 +42,11 @@ export class ReceptionistController {
   constructor(
     private readonly receptionistService: ReceptionistService,
     private readonly abilityService: AbilityFactory,
+    private readonly hotelService: HotelService,
   ) {}
 
   @Post()
+  // @UseInterceptors(ClassSerializerInterceptor)
   async createReceptionist(
     @Body() dto: CreateReceptionistDto,
     @AuthUser() user: UserPayload,
@@ -39,6 +62,7 @@ export class ReceptionistController {
   }
 
   @Patch() // :id
+  // @UseInterceptors(ClassSerializerInterceptor)
   async updateReceptionist(
     @Body() dto: UpdateReceptionistDto,
     @AuthUser() user: UserPayload,
@@ -69,7 +93,25 @@ export class ReceptionistController {
   }
 
   @Get()
-  listReceptionists(@Query() query: ListReceptionistQueryDto): Promise<ReceptionistEntity[]> {
-    return this.receptionistService._findAll({ where: { hotelId: query.hotelId } });
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Roles([PermissionActions.LIST, ReceptionistEntity])
+  async listReceptionists(
+    @Query() query: ListReceptionistQueryDto,
+    @GetAccountInfo() user: AccountInfo,
+  ): Promise<HotelReceptionistDto[]> {
+    if (user.role === RoleTypes.HOTEL_MANAGER) {
+      query.hotelIds = [+user.id];
+    }
+
+    const response = await this.hotelService._findAll({
+      ...(query.hotelIds && { where: { id: In(query.hotelIds) } }),
+      relations: { receptionists: { user: true }, address: false },
+    });
+    return response.map((hotel) => ({
+      id: hotel.id,
+      name: hotel.name,
+      email: hotel.email,
+      receptionists: plainToInstance(ReceptionistInfoDto, hotel.receptionists),
+    }));
   }
 }

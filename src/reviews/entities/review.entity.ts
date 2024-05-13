@@ -94,7 +94,7 @@ export class ReviewEntity extends UuidBaseEntity {
   comment: string;
 
   @Expose({ name: 'total' })
-  getTotalRating(): number {
+  get total(): number {
     return (
       (this.staffRating +
         this.facilityRating +
@@ -105,6 +105,9 @@ export class ReviewEntity extends UuidBaseEntity {
       6
     );
   }
+
+  @Expose()
+  createdAt: Date;
 
   // Foreign keys
   @Column('varchar', { name: 'booking_id' })

@@ -73,6 +73,7 @@ export class AbilityFactory {
 
     if (role === RoleTypes.CUSTOMER) {
       can(PermissionActions.UPDATE, CustomerEntity, { id: user.id });
+      can(PermissionActions.MANAGE, FavoriteEntity, { customerEmail: user.id });
       if (user.isVerified) {
         can(PermissionActions.CREATE, BookingEntity);
         can([PermissionActions.READ, PermissionActions.UPDATE], BookingEntity, {
@@ -82,7 +83,6 @@ export class AbilityFactory {
           'booking.customerEmail': user.id,
         });
         can(PermissionActions.UPDATE, ReviewEntity, { customerEmail: user.id });
-        can(PermissionActions.MANAGE, FavoriteEntity, { customerEmail: user.id });
       }
     }
 

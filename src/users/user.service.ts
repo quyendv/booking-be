@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -49,14 +50,15 @@ export class UserService extends BaseService<UserEntity> {
     roleName,
     isVerified = false,
     shouldCreateFirebaseUser = false,
+    password,
   }: CreateUserDto): Promise<UserEntity> {
     const existingUser = await this.getUserByEmail(email);
     if (existingUser) {
-      throw new BadRequestException(`User "${email}" already exists`);
+      throw new ConflictException(`User "${email}" already exists`);
     }
     const role = await this.roleService.getRoleByName(roleName);
     const user = await this._createOne({ id: email, isVerified, role });
-    if (shouldCreateFirebaseUser) await this.createFirebaseUser(email);
+    if (shouldCreateFirebaseUser) await this.createFirebaseUser(email, password);
     return user;
   }
 
@@ -125,7 +127,7 @@ export class UserService extends BaseService<UserEntity> {
 
   async getCurrentInfo(payload: UserPayload, isVerified?: boolean): Promise<AccountInfo> {
     const user = await this.getUserByEmail(payload.email, isVerified, {
-      hotelManager: true,
+      hotelManager: { hotel: true },
       customer: true,
       receptionist: true,
     });

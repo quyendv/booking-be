@@ -4,6 +4,7 @@ import { AddressEntity } from '~/address/entities/address.entity';
 import { TimestampEntity } from '~/base/a.base.entity';
 import { GenderTypes } from '~/customers/constants/customer.constant';
 import { UserEntity } from '~/users/entities/user.entity';
+import { HotelEntity } from './hotel.entity';
 
 @Entity('hotel_managers')
 export class HotelManagerEntity extends TimestampEntity {
@@ -35,6 +36,9 @@ export class HotelManagerEntity extends TimestampEntity {
   @OneToOne(() => AddressEntity, { nullable: true, cascade: true })
   @JoinColumn({ name: 'address_id' })
   address: AddressEntity;
+
+  @OneToOne(() => HotelEntity, (hotel) => hotel.manager)
+  hotel: HotelEntity;
 
   // Foreign Keys
   @Exclude({ toPlainOnly: true })

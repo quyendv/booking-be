@@ -36,6 +36,7 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
       roleName: RoleTypes.RECEPTIONIST,
       isVerified: true,
       shouldCreateFirebaseUser: true,
+      password: dto.password,
     });
     return this._createOne({
       ...dto,
@@ -50,7 +51,6 @@ export class ReceptionistService extends BaseService<ReceptionistEntity> {
     if (!receptionist) throw new NotFoundException('Receptionist not found to update.');
 
     const { email, ...data } = dto;
-
     return this._updateOne(email, {
       ...data,
       address:
