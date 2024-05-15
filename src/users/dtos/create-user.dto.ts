@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { EmailDto } from '~/base/dtos/base.dto';
 import { RoleTypes } from '../constants/user.constant';
 
@@ -14,4 +14,8 @@ export class CreateUserDto extends EmailDto {
   @IsOptional()
   @IsBoolean()
   shouldCreateFirebaseUser?: boolean;
+
+  @IsOptional()
+  @IsString()
+  password?: string;
 }

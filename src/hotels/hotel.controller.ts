@@ -33,6 +33,8 @@ import { RoomService } from './sub-services/room.service';
 import { HotelManagerEntity } from './entities/hotel-manager.entity';
 import { HotelManagerService } from './sub-services/hotel-manager.service';
 import { UpdateHotelManagerDto } from './dtos/update-hotel-manager.dto';
+import { plainToInstance } from 'class-transformer';
+import { HotelOverviewDto } from './dtos/list-hotels.dto';
 
 @ApiTags('Hotels')
 @Controller('hotels')
@@ -91,14 +93,17 @@ export class HotelController {
   @Get(':id')
   @Roles([PermissionActions.GET, HotelEntity])
   getHotel(@Param('id') id: string): Promise<HotelEntity> {
-    return this.hotelService.getHotelById(+id, { rooms: true, bookings: true });
+    return this.hotelService.getHotelById(+id, { rooms: true, bookings: true, address: true });
   }
 
   @Get()
   @Public()
   // @Roles([PermissionActions.LIST, HotelEntity])
-  listHotels(): Promise<HotelEntity[]> {
-    return this.hotelService._findAll({ relations: { rooms: true } });
+  async listHotels(): Promise<HotelOverviewDto[]> {
+    const response = await this.hotelService._findAll({
+      relations: { rooms: true, reviews: true },
+    });
+    return plainToInstance(HotelOverviewDto, response);
   }
 
   @Post(':id/rooms')

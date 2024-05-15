@@ -49,7 +49,7 @@ export class ReceptionistEntity extends TimestampEntity {
   @Column('int', { name: 'address_id', nullable: true })
   addressId: number;
 
-  @Exclude({ toPlainOnly: true })
+  // @Exclude({ toPlainOnly: true })
   @Column('int', { name: 'hotel_id' })
   hotelId: number;
 

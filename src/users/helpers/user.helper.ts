@@ -9,7 +9,7 @@ export class UserHelper {
   static transformAccountInfo(user: UserEntity, currentPayload?: UserPayload): AccountInfo {
     if (user.roleName === RoleTypes.ADMIN) {
       return {
-        // id: user.id,
+        id: user.id,
         email: user.id,
         isVerified: user.isVerified,
         role: user.roleName,
@@ -18,9 +18,8 @@ export class UserHelper {
       };
     }
     if (user.roleName === RoleTypes.CUSTOMER) {
-      // const customer = await this.customerService.getCustomerByEmail(payload.email);
       return {
-        // id: customer.id,
+        id: user.customer.id,
         email: user.id,
         name: user.customer.name,
         role: user.roleName,
@@ -29,11 +28,8 @@ export class UserHelper {
       };
     }
     if (user.roleName === RoleTypes.HOTEL_MANAGER) {
-      // const hotel = await this.hotelService.getHotelByEmail(payload.email);
-      // const hotelManager = await this.hotelManagerService.getHotelManagerByEmail(user.id);
-
       return {
-        // id: hotel.id,
+        id: user.hotelManager.hotel.id,
         email: user.id,
         name: user.hotelManager.name,
         role: user.roleName,
@@ -42,9 +38,8 @@ export class UserHelper {
       };
     }
     if (user.roleName === RoleTypes.RECEPTIONIST) {
-      // const receptionist = await this.receptionistService.getReceptionistById(payload.email);
       return {
-        // id: receptionist.id,
+        id: user.receptionist.id,
         email: user.id,
         name: user.receptionist.name,
         role: user.roleName,
