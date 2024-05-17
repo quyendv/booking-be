@@ -8,6 +8,8 @@ import { ReviewEntity } from '~/reviews/entities/review.entity';
 import { ReceptionistEntity } from '~/receptionists/entities/receptionist.entity';
 import { HotelManagerEntity } from './hotel-manager.entity';
 import { TimeRules } from '../types/time-rules.type';
+import { Expose } from 'class-transformer';
+import { HotelOverview } from '../types/overview.type';
 
 @Entity('hotels')
 export class HotelEntity extends SequenceBaseEntity {
@@ -80,14 +82,33 @@ export class HotelEntity extends SequenceBaseEntity {
   allowSmoking: boolean;
 
   @Column('jsonb', { name: 'time_rules' })
-  timeRules: TimeRules;
+  timeRules: TimeRules; // TODO: breakfast time
 
   @OneToMany(() => BookingEntity, (booking) => booking.hotel)
   bookings: BookingEntity[];
 
+  @Expose({ groups: ['reviews'] })
   @OneToMany(() => ReviewEntity, (review) => review.hotel)
   reviews: ReviewEntity[];
 
   @OneToMany(() => ReceptionistEntity, (receptionist) => receptionist.hotel)
   receptionists: ReceptionistEntity[];
+
+  @Expose({ groups: ['overview'] })
+  get overview(): HotelOverview {
+    return {
+      rooms: {
+        total: this.rooms.length,
+        minPrice:
+          this.rooms.length === 0 ? null : Math.min(...this.rooms.map((room) => room.roomPrice)),
+      },
+      reviews: {
+        total: this.reviews.length,
+        average:
+          this.reviews.length === 0
+            ? 0
+            : this.reviews.reduce((acc, curr) => acc + curr.total, 0) / this.reviews.length,
+      },
+    };
+  }
 }

@@ -3,9 +3,10 @@ import { SequenceBaseEntity } from '~/base/a.base.entity';
 import { ColumnNumericTransformer } from '~/base/transformers/numeric.transformer';
 import { HotelEntity } from './hotel.entity';
 import { GalleryItem } from '../types/gallery.type';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { BookingEntity } from '~/bookings/entities/booking.entity';
 import { ReviewEntity } from '~/reviews/entities/review.entity';
+import { DateUtils } from '~/base/utils/date.utils';
 
 @Entity('hotel_rooms')
 export class RoomEntity extends SequenceBaseEntity {
@@ -89,11 +90,26 @@ export class RoomEntity extends SequenceBaseEntity {
   @Column('bool', { name: 'sound_proofed', default: false })
   soundProofed: boolean;
 
+  @Expose({ groups: ['bookings'] })
   @OneToMany(() => BookingEntity, (booking) => booking.room)
   bookings: BookingEntity[];
 
   @OneToMany(() => ReviewEntity, (review) => review.room)
   reviews: ReviewEntity[];
+
+  @Expose()
+  get occupiedTimes(): [string, string][] {
+    const result: [string, string][] = [];
+    if (!this.bookings) return result;
+
+    const today = DateUtils.formatDateToYYYYMMDD(new Date());
+    for (const booking of this.bookings) {
+      // if (booking.isCheckedOut) continue;
+      if (DateUtils.isBefore(booking.endDate, today)) continue;
+      result.push([DateUtils.getMaxDate(booking.startDate, today), booking.endDate]);
+    }
+    return result;
+  }
 
   // Foreign Keys
   @Exclude({ toPlainOnly: true })

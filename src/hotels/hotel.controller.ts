@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  SerializeOptions,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -24,17 +25,15 @@ import { BaseResponse } from '~/base/types/response.type';
 import { UserEntity } from '~/users/entities/user.entity';
 import { CreateHotelDto } from './dtos/create-hotel.dto';
 import { CreateRoomDto } from './dtos/create-room.dto';
+import { UpdateHotelManagerDto } from './dtos/update-hotel-manager.dto';
 import { UpdateHotelDto } from './dtos/update-hotel.dto';
 import { UpdateRoomDto } from './dtos/update-room.dto';
+import { HotelManagerEntity } from './entities/hotel-manager.entity';
 import { HotelEntity } from './entities/hotel.entity';
 import { RoomEntity } from './entities/room.entity';
 import { HotelService } from './hotel.service';
-import { RoomService } from './sub-services/room.service';
-import { HotelManagerEntity } from './entities/hotel-manager.entity';
 import { HotelManagerService } from './sub-services/hotel-manager.service';
-import { UpdateHotelManagerDto } from './dtos/update-hotel-manager.dto';
-import { plainToInstance } from 'class-transformer';
-import { HotelOverviewDto } from './dtos/list-hotels.dto';
+import { RoomService } from './sub-services/room.service';
 
 @ApiTags('Hotels')
 @Controller('hotels')
@@ -91,7 +90,8 @@ export class HotelController {
   }
 
   @Get(':id')
-  @Roles([PermissionActions.GET, HotelEntity])
+  @Public()
+  // @Roles([PermissionActions.GET, HotelEntity])
   getHotel(@Param('id') id: string): Promise<HotelEntity> {
     return this.hotelService.getHotelById(+id, { rooms: true, bookings: true, address: true });
   }
@@ -99,11 +99,9 @@ export class HotelController {
   @Get()
   @Public()
   // @Roles([PermissionActions.LIST, HotelEntity])
-  async listHotels(): Promise<HotelOverviewDto[]> {
-    const response = await this.hotelService._findAll({
-      relations: { rooms: true, reviews: true },
-    });
-    return plainToInstance(HotelOverviewDto, response);
+  @SerializeOptions({ groups: ['overview'] })
+  listHotels(): Promise<HotelEntity[]> {
+    return this.hotelService._findAll({ relations: { rooms: { bookings: true }, reviews: true } });
   }
 
   @Post(':id/rooms')

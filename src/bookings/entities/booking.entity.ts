@@ -5,10 +5,10 @@ import { ColumnNumericTransformer } from '~/base/transformers/numeric.transforme
 import { CustomerEntity } from '~/customers/entities/customer.entity';
 import { HotelEntity } from '~/hotels/entities/hotel.entity';
 import { RoomEntity } from '~/hotels/entities/room.entity';
+import { TimeRules } from '~/hotels/types/time-rules.type';
+import { ReviewEntity } from '../../reviews/entities/review.entity';
 import { BookingStatus, PaymentChannel, PaymentCurrency } from '../constants/booking.constant';
 import { PaymentInfo } from '../payment.type';
-import { ReviewEntity } from '../../reviews/entities/review.entity';
-import { TimeRules } from '~/hotels/types/time-rules.type';
 
 @Entity('bookings')
 export class BookingEntity extends UuidBaseEntity {
@@ -79,6 +79,13 @@ export class BookingEntity extends UuidBaseEntity {
   })
   @Expose({ name: 'createdAt' })
   createdAt: Date; // bookedAt - always expose
+
+  // @Expose()
+  // get isCheckedOut(): boolean {
+  //   return [BookingStatus.CHECKED_OUT, BookingStatus.REVIEWED].includes(
+  //     this.status as BookingStatus,
+  //   );
+  // }
 
   // Foreign keys
   @Column('int', { name: 'room_id' })
