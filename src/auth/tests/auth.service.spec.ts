@@ -107,8 +107,8 @@ describe('AuthService', () => {
       jest.spyOn(userService, 'getUserByEmail').mockResolvedValue(null);
       jest.spyOn(userService, 'createUnverifiedCustomer').mockResolvedValue({} as UserEntity);
       jest
-        .spyOn(authService as any, 'generateVerifiedLink')
-        .mockResolvedValue('http://example.com/verify-link');
+        .spyOn(authService as any, 'generateVerificationContent')
+        .mockResolvedValue('Example content with url http://example.com/verify-link');
       jest.spyOn(mailerService, 'sendEmail').mockResolvedValue('ok');
 
       const result = await authService.signUp(payload);

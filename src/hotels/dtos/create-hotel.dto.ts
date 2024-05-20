@@ -15,11 +15,11 @@ import { Validator } from '~/base/constants/validator.constant';
 
 export class TimeRangeDto {
   @IsOptional()
-  @Matches(Validator.Time.REGEX, { message: Validator.Time.message('start') })
+  // @Matches(Validator.Time.REGEX, { message: Validator.Time.message('start') })
   start: string;
 
   @IsOptional()
-  @Matches(Validator.Time.REGEX, { message: Validator.Time.message('end') })
+  // @Matches(Validator.Time.REGEX, { message: Validator.Time.message('end') })
   end: string;
 }
 

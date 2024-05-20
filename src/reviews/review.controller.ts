@@ -21,6 +21,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '~/auth/guards/auth.guard';
 import { RolesGuard } from '~/auth/guards/role.guard';
 import { UpdateReviewDto } from './dtos/update-review.dto';
+import { Public } from '~/auth/decorators/public.decorator';
 
 @ApiTags('Reviews')
 @Controller('reviews')
@@ -54,7 +55,8 @@ export class ReviewController {
   }
 
   @Get('hotels/:id')
-  @Roles([PermissionActions.LIST, ReviewEntity])
+  // @Roles([PermissionActions.LIST, ReviewEntity])
+  @Public()
   async getReviewsByHotelId(@Param('id') hotelId: string): Promise<ReviewEntity[]> {
     return this.reviewService.listHotelReviews(+hotelId);
   }

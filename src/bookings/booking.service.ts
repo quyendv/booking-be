@@ -147,6 +147,10 @@ export class BookingService extends BaseService<BookingEntity> {
           where: { hotelId: hotel.id },
           relations: { room: true, hotel: true, review: true },
         });
+      case RoleTypes.ADMIN:
+        return this._findAll({
+          relations: { room: true, hotel: true, review: true },
+        });
       default:
         throw new ForbiddenException('Invalid user role');
     }
