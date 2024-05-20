@@ -49,6 +49,13 @@ export class AuthController {
     return this.authService.verifyEmail(body.verifyToken);
   }
 
+  @Post('resend-verify-email')
+  async resendVerifyEmail(@AuthUser() user: UserPayload): Promise<void> {
+    // TODO: check if user is already verified
+    const emailContent = (await this.authService.generateVerificationContent(user)).content;
+    await this.authService.sendVerificationEmail(user.email, emailContent);
+  }
+
   @Post('firebase')
   @Roles([PermissionActions.CREATE, 'firebase-account'])
   createFirebaseAccount(@Body() body: { email: string }): Promise<void> {

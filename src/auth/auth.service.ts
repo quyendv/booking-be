@@ -84,7 +84,7 @@ export class AuthService {
     }
   }
 
-  private async generateVerificationContent(
+  async generateVerificationContent(
     payload: UserPayload,
   ): Promise<{ token: string; links: { vn: string; en: string }; content: string }> {
     const { clientURL, jwtSecret } = <IEnvironmentConfig>this.configService.get('environment');
@@ -104,7 +104,7 @@ export class AuthService {
     };
   }
 
-  private async sendVerificationEmail(email: string, content: string): Promise<void> {
+  async sendVerificationEmail(email: string, content: string): Promise<void> {
     Logger.log(`Sending verification email to "${email}"`, 'Start');
     await this.mailerService.sendEmail({
       content,
