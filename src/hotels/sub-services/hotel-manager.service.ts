@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { BaseService } from '~/base/a.base.service';
 import { HotelManagerEntity } from '../entities/hotel-manager.entity';
 import { UpdateHotelManagerDto } from '../dtos/update-hotel-manager.dto';
@@ -11,8 +11,11 @@ export class HotelManagerService extends BaseService<HotelManagerEntity> {
     super(repository);
   }
 
-  async getHotelManagerByEmail(email: string): Promise<HotelManagerEntity> {
-    const manager = await this._findOne({ where: { id: email } });
+  async getHotelManagerByEmail(
+    email: string,
+    options?: FindOneOptions<HotelManagerEntity>,
+  ): Promise<HotelManagerEntity> {
+    const manager = await this._findOne({ where: { id: email }, ...options });
     if (!manager) throw new NotFoundException('Hotel Manager not found.');
     return manager;
   }
