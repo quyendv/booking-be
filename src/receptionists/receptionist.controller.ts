@@ -16,7 +16,7 @@ import { plainToInstance } from 'class-transformer';
 import { In } from 'typeorm';
 import { AbilityFactory } from '~/auth/abilities/ability.factory';
 import { Roles } from '~/auth/decorators/role.decorator';
-import { AuthUser, GetAccountInfo } from '~/auth/decorators/user.decorator';
+import { AuthUser, GetAccountInfo, GetUser } from '~/auth/decorators/user.decorator';
 import { AuthGuard } from '~/auth/guards/auth.guard';
 import { RolesGuard } from '~/auth/guards/role.guard';
 import { UserPayload } from '~/auth/types/request.type';
@@ -44,6 +44,20 @@ export class ReceptionistController {
     private readonly abilityService: AbilityFactory,
     private readonly hotelService: HotelService,
   ) {}
+
+  @Get('me')
+  async getCurrentInfo(@AuthUser() user: UserPayload): Promise<ReceptionistInfoDto> {
+    // const ability = await this.abilityService.getAbilityByEmail(user.email);
+    // ForbiddenError.from(ability)
+    //   .setMessage('Owner Receptionist, HotelManager or Admin can get current info.')
+    //   .throwUnlessCan(
+    //     PermissionActions.GET,
+    //     this.receptionistService._createInstance({ id: user.email }),
+    //   );
+
+    const response = await this.receptionistService.getReceptionistById(user.email);
+    return plainToInstance(ReceptionistInfoDto, response);
+  }
 
   @Post()
   // @UseInterceptors(ClassSerializerInterceptor)

@@ -34,6 +34,8 @@ import { RoomEntity } from './entities/room.entity';
 import { HotelService } from './hotel.service';
 import { HotelManagerService } from './sub-services/hotel-manager.service';
 import { RoomService } from './sub-services/room.service';
+import { plainToInstance } from 'class-transformer';
+import { HotelManagerInfoDto } from './dtos/get-hotel-manager';
 
 @ApiTags('Hotels')
 @Controller('hotels')
@@ -61,6 +63,22 @@ export class HotelController {
         this.hotelManagerService._createInstance({ id: body.email }),
       );
     return this.hotelManagerService.updateHotelManager(body);
+  }
+
+  @Get('manager/me')
+  @Roles([PermissionActions.READ, HotelManagerEntity])
+  async getHotelManager(@AuthUser() user: UserPayload): Promise<HotelManagerInfoDto> {
+    // const ability = await this.abilityService.getAbilityByEmail(user.email);
+    // ForbiddenError.from(ability)
+    //   .setMessage('Owner Hotel Manager can get current info.')
+    //   .throwUnlessCan(
+    //     PermissionActions.GET,
+    //     this.hotelManagerService._createInstance({ id: user.email }),
+    //   );
+    const response = await this.hotelManagerService.getHotelManagerByEmail(user.email, {
+      relations: { address: true, user: true },
+    });
+    return plainToInstance(HotelManagerInfoDto, response);
   }
 
   @Post()
