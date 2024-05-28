@@ -1,0 +1,89 @@
+name: uet-booking-be
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      # - temp
+    paths-ignore:
+      - '**/README.md'
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/uet-booking-be
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # outputs:
+    #   IMAGE_TAG: ${{ steps.short-sha.outputs.sha }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - uses: benjlevesque/short-sha@v2.1
+        id: short-sha
+        with:
+          length: 6
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      # - name: Build and push
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: Dockerfile
+      #     push: true
+      #     tags: ${{ env.DOCKER_IMAGE }}:${{ env.SHA }}
+      #     cache-from: type=registry,ref=${{ env.DOCKER_IMAGE }}:latest
+
+      # - name: Build and push latest
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     file: Dockerfile
+      #     push: true
+      #     tags: ${{ env.DOCKER_IMAGE }}:latest
+      #     cache-from: type=registry,ref=${{ env.DOCKER_IMAGE }}:${{ env.SHA }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect to server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            # Pull the latest image from Docker Hub
+            docker pull ${{ env.DOCKER_IMAGE }}:latest
+
+            # Stop and remove the existing container
+            # if docker ps -a --filter "name=uet-booking-be" --format '{{.Names}}'; then
+            #   docker stop uet-booking-be
+            #   docker rm uet-booking-be
+            # fi
+
+            # Remove the old image
+            # if docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "${{ env.DOCKER_IMAGE }}"; then
+            #   docker rmi $(docker images -q --filter "dangling=true")
+            # fi
+
+            # Change to the deployment directory
+            cd ~/booking/server
+
+            # Run docker-compose up to deploy the new image
+            docker compose --env-file env/.env.production up -d

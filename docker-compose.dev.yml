@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   app-dev:
-    container_name: bookingcare-be-dev
-    image: bookingcare-be-dev
+    container_name: uet-booking-be-dev
+    image: uet-booking-be-dev
     env_file:
       - env/.env.development
     build:
@@ -15,12 +15,12 @@ services:
       - NODE_ENV=development
     restart: unless-stopped
     networks:
-      - bookingcare-be-dev
+      - uet-booking-be-dev
     depends_on:
       - db-dev
 
   db-dev:
-    container_name: bookingcare-db-dev
+    container_name: uet-booking-db-dev
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${DB_USERNAME}
@@ -34,7 +34,7 @@ services:
       - .docker/data/db-dev:/data/db
     restart: unless-stopped
     networks:
-      - bookingcare-be-dev
+      - uet-booking-be-dev
 
   # pgadmin:
   #   container_name: pgadmin4
@@ -49,5 +49,5 @@ services:
   #     - db-dev
 
 networks:
-  bookingcare-be-dev:
+  uet-booking-be-dev:
     driver: bridge

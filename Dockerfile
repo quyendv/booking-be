@@ -23,4 +23,5 @@ COPY --from=build /app/dist ./dist
 
 COPY . .
 
-CMD ["node", "dist/main"]
+# CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]

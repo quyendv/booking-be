@@ -38,4 +38,5 @@ lerna-debug.log*
 .env.local
 .env.development
 .env.production
+.env
 firebase.config.json
