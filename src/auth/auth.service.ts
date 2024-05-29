@@ -60,7 +60,11 @@ export class AuthService {
       throw new UnauthorizedException(`User "${payload.email}" already exists`);
     }
     const emailContent = (await this.generateVerificationContent(payload)).content;
-    await this.userService.createUnverifiedCustomer(payload);
+    await this.userService.createUnverifiedCustomer({
+      email: payload.email,
+      name: payload.name,
+      avatar: payload.picture,
+    });
     await this.sendVerificationEmail(payload.email, emailContent);
     return { status: 'success', message: 'Verification email sent' };
   }
