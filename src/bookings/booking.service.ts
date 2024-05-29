@@ -130,26 +130,31 @@ export class BookingService extends BaseService<BookingEntity> {
   }
 
   async listMyBookings(user: UserEntity): Promise<BookingEntity[]> {
+    // TODO: only booking end date > today
     switch (user.roleName) {
       case RoleTypes.CUSTOMER:
         return this._findAll({
           where: { customerEmail: user.id },
           relations: { room: true, hotel: true, review: true },
+          order: { createdAt: 'DESC' },
         });
       case RoleTypes.HOTEL_MANAGER:
         return this._findAll({
           where: { hotelOwnerEmail: user.id },
           relations: { room: true, hotel: true, review: true },
+          order: { createdAt: 'DESC' },
         });
       case RoleTypes.RECEPTIONIST:
         const hotel = await this.hotelService.getReceptionistHotel(user.id);
         return this._findAll({
           where: { hotelId: hotel.id },
           relations: { room: true, hotel: true, review: true },
+          order: { createdAt: 'DESC' },
         });
       case RoleTypes.ADMIN:
         return this._findAll({
           relations: { room: true, hotel: true, review: true },
+          order: { createdAt: 'DESC' },
         });
       default:
         throw new ForbiddenException('Invalid user role');

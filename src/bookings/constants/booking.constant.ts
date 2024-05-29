@@ -45,7 +45,7 @@ export enum BookingStatus {
   // CANCELLED = 'cancelled',
   // REFUNDED = 'refunded',
 
-  PENDING = 'pending', // waiting payment
+  // PENDING = 'pending', // waiting payment
   BOOKED = 'booked', // paid
   CHECKED_IN = 'checked_in',
   CHECKED_OUT = 'checked_out',

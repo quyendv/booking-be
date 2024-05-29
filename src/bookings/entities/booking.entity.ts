@@ -69,7 +69,7 @@ export class BookingEntity extends UuidBaseEntity {
   @Column('jsonb', { name: 'payment_info', nullable: true })
   paymentInfo: PaymentInfo; // Payment info from payment gateway
 
-  @Column('varchar', { name: 'status', default: BookingStatus.PENDING })
+  @Column('varchar', { name: 'status', default: BookingStatus.BOOKED })
   status: string;
 
   @CreateDateColumn({
