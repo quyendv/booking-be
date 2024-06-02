@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { envPath } from './env.config';
+import { ChangeDefaultBookingStatus1717045871182 } from '../database/migrations/1717045871182-ChangeDefaultBookingStatus';
 
 config({ path: envPath });
 const configService = new ConfigService();
@@ -14,8 +15,8 @@ export const dataSourceOptions: DataSourceOptions = {
   password: configService.get<string>('DB_PASSWORD'),
   database: configService.get<string>('DB_NAME'),
   entities: ['dist/**/entities/*.entity.js'],
-  migrations: ['dist/src/database/migrations/*.js', 'dist/src/database/seeds/*.js'],
-  // migrations: [],
+  // migrations: ['dist/src/database/migrations/*.js', 'dist/src/database/seeds/*.js'],
+  migrations: [ChangeDefaultBookingStatus1717045871182],
   // entities: ['src/**/entities/*.entity.ts'],
   // migrations: ['src/database/migrations/*.ts', 'src/database/seeds/*.ts'],
 };
